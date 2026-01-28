@@ -1,0 +1,65 @@
+# --- Archivos binarios y objetos generados por compilación ---
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.so
+*.dll
+*.dylib
+*.ko
+*.elf
+*.lib
+*.la
+*.lo
+*.i*86
+*.x86_64
+*.hex
+*.app
+
+# --- Archivos de imágenes de disco ---
+*.img
+
+# --- Carpetas de salida / compilación ---
+Presentacion/
+output/
+*/output/
+bin/
+build/
+dist/
+.tmp_versions/
+Module.symvers
+
+# --- Archivos de depuración ---
+*.stackdump
+*.core
+*.pdb
+*.dSYM/
+*.su
+*.idb
+*.dwo
+
+# --- Archivos intermedios / temporales ---
+*.tmp
+*.temp
+*.log
+*.bak
+*.old
+Mkfile.old
+
+# --- Archivos generados por el sistema ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# --- Configuraciones locales de VSCode (opcional) ---
+# .vscode/
+# !.vscode/settings.json
+# !.vscode/tasks.json
+# !.vscode/launch.json
+
+# --- Kernel Module Compile Results ---
+*.mod*
+*.cmd
+dkms.conf
