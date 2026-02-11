@@ -15,3 +15,4 @@ Aplicar los conceptos fundamentales de la materia mediante ejercicios y práctic
 
 ## 📌 Notas
 Repositorio con fines educativos.
+Ensamblador 386 de 32 bits
