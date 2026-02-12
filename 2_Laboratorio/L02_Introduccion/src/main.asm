@@ -1,10 +1,13 @@
 %include "./pc_io.inc"
 
 section .data	;Datos inicializados
-	msg1:	db "Ingresa tu nombre",10,0
-	msg2:	db "Hola ",0
+	msg1:	db	"Ingresa tu nombre",10,0
+	msg2:	db	"Hola ",0
+	msj:	db	'Ingrese un digito (0-9)',0x0A
+	len:	equ	$-msj							
 
-section .bss	;Datos no inicializados
+section	.bss	;Datos no inicializados
+	num1 	resb 1
 	nombre	resb 256
 
 section .text
