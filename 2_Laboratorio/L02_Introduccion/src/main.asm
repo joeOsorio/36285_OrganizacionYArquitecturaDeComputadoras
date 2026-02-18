@@ -1,5 +1,5 @@
 
-	; Nota: direccion relativa en el repositorio.  >cd 2_Laboratorio/L02_Introduccion
+; Nota: direccion relativa en el repositorio.  >cd 2_Laboratorio/L02_Introduccion
 
 %include "./pc_io.inc"
 
@@ -18,14 +18,14 @@ section .text
 	global _start:
 
 _start:
-	;Codigo 1.
-	mov eax, 4 		;Carga instruccion del sistema.
-	mov ebx, 1		;Indica que muestre algo en pantalla.
-	mov ecx, msj	;Carga la direccion de mensaje.
-	mov edx, len	;Carga la longitud del mensaje.
-	int 80h			;Finaliza instruccion.
+	; ; Codigo 1.
+	; mov eax, 4 		;Carga instruccion del sistema.
+	; mov ebx, 1		;Indica que muestre algo en pantalla.
+	; mov ecx, msj	;Carga la direccion de mensaje.
+	; mov edx, len	;Carga la longitud del mensaje.
+	; int 80h			;Finaliza instruccion.
 
-	;Codigo 2.
+	; ;Codigo 2.
 	; mov eax, 3		;carga instruccion al sistema.
 	; mov ebx, 0		;Instruccion captura.
 	; mov ecx, num1	;Direccion de variable.
@@ -39,11 +39,9 @@ _start:
 	; mov edx, 1		;Logitud de variable.
 	; int 80h			;Ejecutar instrucción
 
+	;Parte 5.b practica
 	mov edx, msj
 	call puts
-
-
-
 
 	;Inicio de codigo base.
 	mov edx, msg1	;Imprimir mensaje 1
