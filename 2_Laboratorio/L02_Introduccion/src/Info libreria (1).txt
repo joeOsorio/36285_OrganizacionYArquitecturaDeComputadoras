@@ -67,3 +67,36 @@ nasm -f elf entrada.asm
 
 Ensamblar 2
 ld -m elf_i386 -s -o entrada  entrada.o LIB/libpc_io.a
+
+
+
+Otros codigos.
+;en eax el valor a convertir mostrar en hexadecimal
+printHex:
+  pushad
+  mov edx, eax
+  mov ebx, 0fh
+  mov cl, 28
+.nxt: shr eax,cl
+.msk: and eax,ebx
+  cmp al, 9
+  jbe .menor
+  add al,7
+.menor:add al,'0'
+  mov byte [esi],al
+  inc esi
+  mov eax, edx
+  cmp cl, 0
+  je .print
+  sub cl, 4
+  cmp cl, 0
+  ja .nxt
+  je .msk
+.print: mov eax, 4
+  mov ebx, 1
+  sub esi, 8
+  mov ecx, esi
+  mov edx, 8
+  int 80h
+  popad
+  ret
