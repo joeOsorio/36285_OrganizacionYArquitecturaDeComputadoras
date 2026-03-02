@@ -31,7 +31,7 @@ _start:
 	mov     [ebx],      al
 	mov     al,         '='			; Mostrar mensaje 2
 	call    putchar
-	mov     al,         0			; Logica para comvertir el utimo caracter a numero.
+	; mov     al,         0			; Logica para comvertir el utimo caracter a numero.
 	mov ebx, num2
 	mov ecx, [ebx]					; Guardar el numero en el contador.
 	mov     ebx,        num1
@@ -60,6 +60,18 @@ multi: 						; Ocupa el registro ecx, ebx y al
 		cmp ecx, 0			; Compara el registro ecx con 0, Seria como el if
 		je .finrep			; Realiza salto al fin.
 		add     al,[ebx]	; Multiplicar es sumar tantas veces el mismo numero.
+		loop .rep 			; Esta funcion revisa el registo ecx y en automatico decrementa. Solo decrementa cl pero como 
+	.finrep:
+	mov [resu], al			
+	popad
+	ret
+
+divis: 						; Ocupa el registro ecx, ebx y al
+	pushad
+	.rep:					; Logica para multiplicar.
+		cmp ecx, 0			; Compara el registro ecx con 0, Seria como el if
+		je .finrep			; Realiza salto al fin.
+		sub     al,[ebx]	; Dividier es restar tantas veces el mismo numero.
 		loop .rep 			; Esta funcion revisa el registo ecx y en automatico decrementa. Solo decrementa cl pero como 
 	.finrep:
 	mov [resu], al			
