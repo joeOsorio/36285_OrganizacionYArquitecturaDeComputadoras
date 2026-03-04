@@ -33,4 +33,3 @@ Rutina: getch
 Parametros:
 ;    Entrada:
 ;    Salida:   AL contiene el caracter tecleado
-

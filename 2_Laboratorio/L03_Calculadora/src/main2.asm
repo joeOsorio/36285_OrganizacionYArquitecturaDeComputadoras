@@ -89,6 +89,7 @@ impDec:
 ; mox ecx, al
 ; 	.rep:
 ; 		cmp ecx, 0
+;			ebx
 ; 		je .finrep
 ; 		dec ecx
 		

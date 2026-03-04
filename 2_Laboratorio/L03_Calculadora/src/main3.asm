@@ -11,13 +11,12 @@
 
 section .data						;Datos inicializados
 	msj1:	db	"Programa para multiplicar 2 numeros", 10, 0
-	buffer:	times 10 db 0	; Espacio para almacenar hasta 10 dígitos
-	len 	equ	10
+	len:	equ	$-msj1
 
 section .bss						;Datos no inicializados
-	num1    resb       1			; 1 byte va desde 0 hasta 255.
-	num2    resb       1
-
+	num1    	resb	1			; 1 byte va desde 0 hasta 255.
+	num2    	resb	1			
+	cad 		resb 	8
 section .text
 	global  _start:
 
@@ -32,28 +31,61 @@ _start:
 	mov     [ebx],      al			; Guardar numero en variable.
 	mov     al,         'x'			; Mostrar mensaje 2
 	call    putchar
-	call    getche					; Capturar -----------------
-	mov     ebx,        num2
+	call    getche					; Capturar numero 2
+	mov     edx,        num2
 	sub     al,         48			; Realizar casteo a numero.
-	mov     [ebx],      al
+	mov     [edx],      al
 	mov     al,         '='			; Mostrar mensaje 2
 	call    putchar
-	mov 	ebx, num2
-	mov 	ecx, [ebx]					; Guardar el numero en el contador.
-	mov 	ebx, num1
-	call 	multi
-	add 	al, '0'			; Convertir resultado a ASCII.
-	call 	putchar
-	; movzx eax, byte [resu]			; Cargamos el numero a convertir (extendemos a 32 bits).
-	; lea edi, [buffer + len - 1]		; Apuntamos al final del buffer.
-	; mov ebx, 10						; Base decimal
-	; call convert_loop
-	; lea edx, [buffer]				; Cargamos la dirección del buffer.
-	; call    puts	
-	; call    salto
+
+	;-------------- Para multiplicar --------------
+	; mov 	ebx, num2				; Guardar el numero en ebx para la multiplicacion.
+	mov 	ecx, [edx]				; Guardar el numero en el contador para funcion ebx.
+	mov 	ebx, num1				; El registro ebx lo utiliza la funcion multi.
+	call 	multi					; como el resultado lo regresa en al ya no es necesario cargar en eax.
+	mov esi, cad					; Es necesario para utilizar printHex
+	call	printHex
+	call 	salto
+	;-------------- Para Dividir --------------
+	
+
+	; Fin
+
 	mov     eax,        1			;Carga la instruccion de salida de programa.
 	mov     ebx,        0			;Indica que termino correctamente, como un return 0 en c.
 	int     80h						;Llamada a kener con las anteriores mensajes. Fin del programa main.
+
+
+
+multi: 						; Ocupa el registro ecx: contador, ebx: numero a sumar y al : resultado.'
+	mov		eax, 0			;Limpiar todo el registro eax porque ahi guardamos el resultado.
+	.ciclo:
+		add     al,[ebx]	; Multiplicar es sumar tantas veces el mismo numero.
+		loop .ciclo			; Esta funcion revisa el registo ecx y en automatico decrementa. Solo decrementa cl pero como
+
+	ret
+
+; divi: 						; Ocupa el registro ecx: contador, ebx: numero a sumar y al : resultado.
+; 	cmp	dl, 0
+; 	je	fin_divi
+; 	; xor al, al				; Limpiar el resultado.
+; 	; .rep:					; Logica para multiplicar.
+; 	sub     dl, cl	; Multiplicar es sumar tantas veces el mismo numero.
+; 		; loop .rep 			; Esta funcion revisa el registo ecx y en automatico decrementa. Solo decrementa cl pero como
+; 	inc al
+; 	jmp divi
+; fin_divi:
+
+; divi: 						; Ocupa el registro ecx: contador, ebx: numero a dividir y al : resultado.
+; 	xor al, al				; Limpiar el resultado.
+; 	.rep:					; Logica para multiplicar.
+; 		cmp ecx, 0			; Compara el registro ecx con 0, Seria como el if
+; 		je .finrep			; Realiza salto al fin.
+; 		sub     al,[ebx]	; Multiplicar es sumar tantas veces el mismo numero.
+; 		loop .rep 			; Esta funcion revisa el registo ecx y en automatico decrementa. Solo decrementa cl pero como 
+; 	.finrep:
+; 	; mov [resu], al			
+; 	ret
 
 salto:
 	pushad
@@ -63,44 +95,8 @@ salto:
 	call    putchar
 	popad
 	ret
-
-multi: 						; Ocupa el registro ecx: contador, ebx: numero a sumar y al : resultado.
-	xor al, al				; Limpiar el resultado.
-	.rep:					; Logica para multiplicar.
-		cmp ecx, 0			; Compara el registro ecx con 0, Seria como el if
-		je .finrep			; Realiza salto al fin.
-		add     al,[ebx]	; Multiplicar es sumar tantas veces el mismo numero.
-		loop .rep 			; Esta funcion revisa el registo ecx y en automatico decrementa. Solo decrementa cl pero como 
-	.finrep:
-	; mov [resu], al			
-	ret
-
-divi: 						; Ocupa el registro ecx: contador, ebx: numero a dividir y al : resultado.
-	xor al, al				; Limpiar el resultado.
-	.rep:					; Logica para multiplicar.
-		cmp ecx, 0			; Compara el registro ecx con 0, Seria como el if
-		je .finrep			; Realiza salto al fin.
-		add     al,[ebx]	; Multiplicar es sumar tantas veces el mismo numero.
-		loop .rep 			; Esta funcion revisa el registo ecx y en automatico decrementa. Solo decrementa cl pero como 
-	.finrep:
-	; mov [resu], al			
-	ret
-
-impDec:
-	pushad
-	
-		
-	; mov     al,         13
-	; call    putchar
-	; mov     al,         10
-	; call    putchar
-	popad
-	ret
-
-
-	; otros
-
-	;en eax el valor a convertir mostrar en hexadecimal
+;en el registro eax el valor a convertir mostrado en hexadecimal
+;en el registro esi poner la direccion de una cadena de al menos 10 bytes
 printHex:
   pushad
   mov edx, eax
@@ -129,20 +125,3 @@ printHex:
   int 80h
   popad
   ret
-
-
-;Prueba
-
-
-convert_loop:
-	pushad
-	.loop:
-		xor edx, edx          ; Limpiar EDX para la división
-		div ebx               ; EAX = cociente, EDX = residuo
-		add dl, '0'           ; Convertir residuo a ASCII (sumar 30h)
-		mov [edi], dl         ; Guardar caracter
-		dec edi               ; Mover puntero del búfer hacia atrás
-		test eax, eax         ; ¿El cociente es 0?
-		jnz .loop             ; Si no, continuar el loop
-	popad	
-	ret
