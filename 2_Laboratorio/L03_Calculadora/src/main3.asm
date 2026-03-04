@@ -47,17 +47,18 @@ _start:
 	call	printHex
 	call 	salto
 	;-------------- Para Dividir --------------
-	
 
-	; Fin
-
+	;-------------- Fin --------------
 	mov     eax,        1			;Carga la instruccion de salida de programa.
 	mov     ebx,        0			;Indica que termino correctamente, como un return 0 en c.
 	int     80h						;Llamada a kener con las anteriores mensajes. Fin del programa main.
 
 
 
-multi: 						; Ocupa el registro ecx: contador, ebx: numero a sumar y al : resultado.'
+multi:
+	;    Entrada:  ECX Veces que se repite la suma.
+	;              EBX numero a sumar
+	;    Salida:   AL Resultado
 	mov		eax, 0			;Limpiar todo el registro eax porque ahi guardamos el resultado.
 	.ciclo:
 		add     al,[ebx]	; Multiplicar es sumar tantas veces el mismo numero.

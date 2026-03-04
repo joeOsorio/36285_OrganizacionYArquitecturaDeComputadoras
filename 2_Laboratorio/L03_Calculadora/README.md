@@ -1,3 +1,11 @@
 Notas de clase:
 inc meneja 8bits
- podemos    
+podemos
+
+gia de registros: https://www.cs.virginia.edu/~evans/cs216/guides/x86.html
+
+
+
+esi
+edi
+tiene sub registros si di
