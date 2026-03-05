@@ -33,3 +33,13 @@ Rutina: getch
 Parametros:
 ;    Entrada:
 ;    Salida:   AL contiene el caracter tecleado
+
+
+
+je igual
+jne diferente
+jmp Realiza simpre el salto.
+
+Registros de direccionamiento 
+ESI Origen
+EDI Destino

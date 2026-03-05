@@ -20,7 +20,7 @@ section .data						;Datos inicializados
 	len4:	equ	$-msj4
 	msj5:	db	"Programa para capturar texto", 10, 0
 	len5:	equ	$-msj5
-	msj6:	db	"Palindromo ", 10, 0
+	msj6:	db	"programa para saber si es o no Palindromo ", 10, 0
 	len6:	equ	$-msj6
 	msj7:	db	"Si es palindromo", 10, 0
 	len7:	equ	$-msj7
@@ -84,19 +84,18 @@ _start:
 	; call pares
 	; call salto
 	;-------------- 5 - Capturar texto --------------
-	mov     edx,        msj5		; Mostrar mensaje 1
+	mov     edx,    msj5		; Mostrar mensaje 1
 	call    puts
-	mov		ebx, cadena
-	call capturarTxt
+	mov		ebx, 	cadena
+	call	capturarTxt
+	; edi 
 	;-------------- 6 - Palindromo --------------
-	mov     edx,        msj6		; Mostrar mensaje 1
+	mov     edx,	msj6	; Mostrar mensaje 1
 	call    puts
-	mov 	ebx,	cadena
 	call 	palindromo
-	mov al, dl
-	mov ebx, 0
-	mov esi, cad
-	call printHex
+	mov		eax,	edx		; Cargar EAX para funcion printHex
+	mov 	esi, 	cad
+	call	printHex
 	;-------------- Fin --------------
 	mov     eax,        1			;Carga la instruccion de salida de programa.
 	mov     ebx,        0			;Indica que termino correctamente, como un return 0 en c.
@@ -159,85 +158,44 @@ numeros:
     ret
 
 capturarTxt:
-	;	Entrada:  EDX -> Dir de la variable.
-	;	Salida:   AL -> Caracter capturado.
+	;	Entrada:  	EBX -> Dir de la variable.
+	;	Salida:		AL -> Caracter capturado.
+	;				EDI ->	cumuladro de cuento me desplace.
+	mov edi, 0
+	; en dh inicio
 	capturar:
 		call getche
 		cmp al, 10			; Compara con el salto de linea para terminar la captura.
 		je 	fin_captura
-		mov byte [ebx], al
-		inc ebx
+		; je enter no agrer caracter.
+		mov byte [ebx + edi], al
+		inc edi
 		jmp capturar
 	fin_captura:
 	ret
 
 palindromo:
-	; Entrada: ebx cadena a evaluar. 
-	; Salida: dl bandera que indica 0: No palindromo, 1: Si palindromo
-	mov edx, 0
-	dec  esi
-	.ciclo:
-		mov ah, [ebx + esi]
-		cmp al, [ebx + edi]
-		je fin_ciclo
+	; Entrada:	EBX -> Direccion de la cadena a evaluar. 
+	;			EDI -> Longitud de cadena
+	; Utiliza:	ESI
+	; Salida:	DL bandera que indica 0: No palindromo, 1: Si palindromo
+	mov 	edx,	0
+	dec  	edi
+	mov		esi, 	0
+	ciclo:
+		mov ah,	[ebx + edi]
+		mov al, [ebx + esi]
+		cmp ah,	al
+		jne fin_ciclo
 		dec edi
 		inc esi
 		cmp edi, esi
-		mov dl, 1
-		je fin_ciclo
+		je sies
+		jmp ciclo
+	sies:
+		mov edx, 1
 	fin_ciclo:
-	; cmp dl, 0
-	; je siEs
-
-	; siEs:
-	; 	mov     edx,        msj6		; Mostrar mensaje 6
-	; 	call    puts
-	
-	; mov     edx,        msj7		; Mostrar mensaje 1
-	; call    puts
-
-
 ret
-
-; divi: 						; Ocupa el registro ecx: contador, ebx: numero a sumar y al : resultado.
-; 	mov eax,	0
-; 	.bucle:
-; 		cmp	dh, 0
-; 		je	fin_divi
-; 		; xor al, al				; Limpiar el resultado.
-; 		; .rep:					; Logica para multiplicar.
-; 		sub     dh, dl	; Multiplicar es sumar tantas veces el mismo numero.
-; 			; loop .rep 			; Esta funcion revisa el registo ecx y en automatico decrementa. Solo decrementa cl pero como
-; 		inc al
-; 		jmp .bucle
-; 	.fin_divi:
-; 	ret
-
-
-
-
-; no modificado
-; divi: 						; Ocupa el registro ecx: contador, ebx: numero a sumar y al : resultado.
-; 	cmp	dl, 0
-; 	je	fin_divi
-; 	; xor al, al				; Limpiar el resultado.
-; 	; .rep:					; Logica para multiplicar.
-; 	sub     dl, cl	; Multiplicar es sumar tantas veces el mismo numero.
-; 		; loop .rep 			; Esta funcion revisa el registo ecx y en automatico decrementa. Solo decrementa cl pero como
-; 	inc al
-; 	jmp divi
-; fin_divi:
-
-; divi: 						; Ocupa el registro ecx: contador, ebx: numero a dividir y al : resultado.
-; 	xor al, al				; Limpiar el resultado.
-; 	.rep:					; Logica para multiplicar.
-; 		cmp ecx, 0			; Compara el registro ecx con 0, Seria como el if
-; 		je .finrep			; Realiza salto al fin.
-; 		sub     al,[ebx]	; Multiplicar es sumar tantas veces el mismo numero.
-; 		loop .rep 			; Esta funcion revisa el registo ecx y en automatico decrementa. Solo decrementa cl pero como 
-; 	.finrep:
-; 	; mov [resu], al			
-; 	ret
 
 salto:
 	pushad
@@ -247,9 +205,11 @@ salto:
 	call    putchar
 	popad
 	ret
-;en el registro eax el valor a convertir mostrado en hexadecimal
-;en el registro esi poner la direccion de una cadena de al menos 10 bytes
+
 printHex:
+;	Entrada:	EAX -> valor a convertir.
+;				ESI -> Necesita una cadena de min 10.
+;	Salida:		Ninguna
   pushad
   mov edx, eax
   mov ebx, 0fh
