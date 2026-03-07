@@ -24,6 +24,8 @@ section .data						;Datos inicializados
 	len6:	equ	$-msj6
 	msj7:	db	"Si es palindromo", 10, 0
 	len7:	equ	$-msj7
+	msj8:	db	"No es palindromo", 10, 0
+	len8:	equ	$-msj8
 
 section .bss						;Datos no inicializados
 	num1    	resb	1			; 1 byte va desde 0 hasta 255.
@@ -36,101 +38,120 @@ section .text
 _start:
 	call    clrscr					; Limpiamos pantalla
 	call    salto	
-	; mov     edx,        msj1		; Mostrar mensaje 1
-	; call    puts
-	; call    getche					; Capturar numero 1
-	; mov     ebx,        num1
-	; sub     al,         48			; Realizar casteo a numero.
-	; mov     [ebx],      al			; Guardar numero en variable.
-	; mov     al,         'x'			; Mostrar mensaje 2
-	; call    putchar
-	; call    getche					; Capturar numero 2
-	; mov     edx,        num2
-	; sub     al,         48			; Realizar casteo a numero.
-	; mov     [edx],      al
-	; mov     al,         '='			; Mostrar mensaje 2
-	; call    putchar
+	mov     edx,        msj1		; Mostrar mensaje 1
+	call    puts
+	call    getche					; Capturar numero 1
+	mov     ebx,        num1
+	sub     al,         48			; Realizar casteo a numero.
+	mov     [ebx],      al			; Guardar numero en variable.
+	mov     al,         'x'			; Mostrar mensaje 2
+	call    putchar
+	call    getche					; Capturar numero 2
+	mov     edx,        num2
+	sub     al,         48			; Realizar casteo a numero.
+	mov     [edx],      al
+	mov     al,         '='			; Mostrar mensaje 2
+	call    putchar
 
-	; ;-------------- 1 - Para multiplicar --------------
-	; ; mov 	ebx, num2				; Guardar el numero en ebx para la multiplicacion.
-	; mov 	ecx, 		[edx]		; Guardar el numero en el contador para funcion ebx.
-	; mov 	ebx, 		num1		; El registro ebx lo utiliza la funcion multi.
-	; call 	multi					; como el resultado lo regresa en al ya no es necesario cargar en eax.
-	; mov 	esi, 		cad			; Es necesario para utilizar printHex
-	; call	printHex
-	; call 	salto
-	; ;-------------- 2 - Para Dividir --------------
-	; mov     edx,        msj2		; Mostrar mensaje 1
-	; call    puts
-	; mov 	dh, al
-	; mov		ebx, num1
-	; mov		dl, [ebx]
-	; call	divi
-	; mov 	esi, 		cad			; Es necesario para utilizar printHex
-	; call	printHex
-	; call 	salto
-	; ;-------------- 3 - Para numeros 0 al 100 --------------
-	; mov     edx,        msj3		; Mostrar mensaje 1
-	; call    puts
-	; mov 	dh, 100
-	; mov		dl, 0
-	; call numeros
-	; call salto
-	; ;-------------- 4 - Para numeros pares --------------
-	; mov     edx,        msj4		; Mostrar mensaje 1
-	; call    puts
-	; mov 	dh, 100
-	; mov		dl, 0
-	; call pares
-	; call salto
+	;-------------- 1 - Para multiplicar --------------
+	mov		edx, 		num1
+	mov 	cl, 		[edx]	
+	mov		edx, 		num1
+	mov 	ch, 		[edx]
+	mov		eax, 		0		
+	call 	multi					; Como el resultado lo regresa en al ya no es necesario cargar en eax solo limpiarlo. 
+	mov 	esi, 		cad			; Es necesario para utilizar printHex
+	call	printHex
+	call 	salto
+	;-------------- 2 - Para Dividir --------------
+	mov		dh,			al			; Muevo el resultado para utiliarza la funcion dividir.
+	mov     edx,        msj2		; Mostrar mensaje
+	call    puts
+	call	printHex				; Mostrar operación
+	mov     al,        '/' 
+	call    putchar
+	; mov		al,		num2
+	; mov		al,			48
+	call    putchar
+	mov     al,        '='
+	call    putchar
+	mov		ebx, 		num2
+	add		byte[ebx],		48
+	mov		dl, 		[ebx]
+	call	divi
+	mov		eax,		0			; Limpiar registros
+	mov 	esi, 		cad			; Es necesario para utilizar printHex
+	call	printHex
+	call 	salto
+	; -------------- 3 - Para numeros 0 al 100 --------------
+	mov     edx,        msj3		; Mostrar mensaje 1
+	call    puts
+	mov 	dh, 100
+	mov		dl, 0
+	call numeros
+	call salto
+	;-------------- 4 - Para numeros pares --------------
+	mov     edx,        msj4		; Mostrar mensaje 1
+	call    puts
+	mov 	dh, 100
+	mov		dl, 0
+	call numPares
+	call salto
 	;-------------- 5 - Capturar texto --------------
 	mov     edx,    msj5		; Mostrar mensaje 1
 	call    puts
 	mov		ebx, 	cadena
 	call	capturarTxt
-	; edi 
 	;-------------- 6 - Palindromo --------------
-	mov     edx,	msj6	; Mostrar mensaje 1
+	mov     edx,	msj6	; Mostrar mensaje
 	call    puts
 	call 	palindromo
-	mov		eax,	edx		; Cargar EAX para funcion printHex
-	mov 	esi, 	cad
-	call	printHex
+	; mov		eax,	edx		; Cargar EAX para funcion printHex
+	; mov 	esi, 	cad
+	; call	printHex
+	cmp	edx, 1
+	je pal
+	mov     edx,	msj8	; Mostrar mensaje
+	call    puts
+	jmp fin
+	pal:
+	mov     edx,	msj7	; Mostrar mensaje
+	call    puts
+	fin:
 	;-------------- Fin --------------
-	mov     eax,        1			;Carga la instruccion de salida de programa.
-	mov     ebx,        0			;Indica que termino correctamente, como un return 0 en c.
-	int     80h						;Llamada a kener con las anteriores mensajes. Fin del programa main.
-
+	mov     eax,        1	;Carga la instruccion de salida de programa.
+	mov     ebx,        0	;Indica que termino correctamente, como un return 0 en c.
+	int     80h				;Llamada a kener con las anteriores mensajes. Fin del programa main.
 
 multi:
-	;    Entrada:  ECX Veces que se repite la suma.
-	;              EBX numero a sumar
-	;    Salida:   AL Resultado
-	mov		eax, 0			;Limpiar todo el registro eax porque ahi guardamos el resultado.
+	; Entrada: 	CL	->	Veces que se repite la suma.
+	; 			CH	->	numero a sumar
+	; Salida:   Al	->	Resultado
+	mov		al, 0			;Limpiar todo el registro eax porque ahi guardamos el resultado.
 	.ciclo:
-		add     al,[ebx]	; Multiplicar es sumar tantas veces el mismo numero.
+		add     al,ch		; Multiplicar es sumar tantas veces el mismo numero.
 		loop .ciclo			; Esta funcion revisa el registo ecx y en automatico decrementa. Solo decrementa cl
 	ret
 
 divi:
-	;	Entrada:  DH -> Divisor
-	;             DL -> Dividendo
+	;	Entrada:  DL -> Divisor
+	;             DH -> Dividendo
 	;	Salida:   AL -> Resultado
-    mov eax, 0        ; cociente = 0
+    mov eax, 0				; cociente = 0
 	.bucle:
-		cmp dh, dl        ; Dividendo es menor que divisor
-		jb .fin_divi      ; Si es menor, terminamos
-		sub dh, dl        ; Dividendo -= divisor
-		inc al            ; cociente++
+		cmp dl, dh			; Dividendo es menor que divisor
+		jb .fin_divi		; Si es menor, terminamos
+		sub dl, dh			; Dividendo -= divisor
+		inc al				; cociente++
 		jmp .bucle
 
 	.fin_divi:
     ret
 
-pares:
-	;	Entrada:  DH -> Fin
-	;			  DL -> Inicio
-	;	Salida:   Ninguna
+numPares:
+	;	Entrada:  DL -> Inicio
+	;			  DH -> Fin
+	;	Salida:   Muesta los valores en consola
 	.bucle:
 		cmp 	dh, dl			; Dividendo es menor que divisor	
 		jb 		.fin_divi		; Si es menor, terminamos
@@ -143,9 +164,9 @@ pares:
     ret
 
 numeros:
-	;	Entrada:  DH -> Fin
-	;			  DL -> Inicio
-	;	Salida:   Ninguna
+	;	Entrada:  DL -> Inicio
+	;			  DH -> Fin
+	;	Salida:   Muesta los valores en consola
 	.bucle:
 		cmp 	dh, dl			; Dividendo es menor que divisor	
 		jb 		.fin_divi		; Si es menor, terminamos
@@ -158,11 +179,10 @@ numeros:
     ret
 
 capturarTxt:
-	;	Entrada:  	EBX -> Dir de la variable.
-	;	Salida:		AL -> Caracter capturado.
-	;				EDI ->	cumuladro de cuento me desplace.
+	; Entrada:	EBX -> Dir de la variable.
+	; Salida:	AL -> Caracter capturado.
+	; 			EDI -> Acumuladro de cuento me desplace.
 	mov edi, 0
-	; en dh inicio
 	capturar:
 		call getche
 		cmp al, 10			; Compara con el salto de linea para terminar la captura.
@@ -179,8 +199,8 @@ palindromo:
 	;			EDI -> Longitud de cadena
 	; Utiliza:	ESI
 	; Salida:	DL bandera que indica 0: No palindromo, 1: Si palindromo
-	mov 	edx,	0
-	dec  	edi
+	mov 	edx,	0	; Bandera
+	dec  	edi			; Quiene
 	mov		esi, 	0
 	ciclo:
 		mov ah,	[ebx + edi]
@@ -198,6 +218,7 @@ palindromo:
 ret
 
 salto:
+	; Utiliza:	al
 	pushad
 	mov     al,         13
 	call    putchar
@@ -207,9 +228,9 @@ salto:
 	ret
 
 printHex:
-;	Entrada:	EAX -> valor a convertir.
-;				ESI -> Necesita una cadena de min 10.
-;	Salida:		Ninguna
+;	Entrada:	EAX -> Valor a convertir.
+;				ESI -> Necesita una cadena de minimo 10 byte's.
+;	Salida:		Muestra valor en consola.
   pushad
   mov edx, eax
   mov ebx, 0fh
