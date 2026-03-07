@@ -32,12 +32,13 @@ section .bss						;Datos no inicializados
 	num2    	resb	1			
 	cad 		resb 	8
 	cadena 		resb 	256
+
 section .text
 	global  _start:
 
 _start:
 	call    clrscr					; Limpiamos pantalla
-	call    salto	
+	call    salto
 	mov     edx,        msj1		; Mostrar mensaje 1
 	call    puts
 	call    getche					; Capturar numero 1
@@ -56,53 +57,58 @@ _start:
 	;-------------- 1 - Para multiplicar --------------
 	mov		edx, 		num1
 	mov 	cl, 		[edx]	
-	mov		edx, 		num1
-	mov 	ch, 		[edx]
+	mov		edx, 		num2
+	mov 	bl, 		[edx]
 	mov		eax, 		0		
 	call 	multi					; Como el resultado lo regresa en al ya no es necesario cargar en eax solo limpiarlo. 
 	mov 	esi, 		cad			; Es necesario para utilizar printHex
 	call	printHex
 	call 	salto
 	;-------------- 2 - Para Dividir --------------
-	mov		dh,			al			; Muevo el resultado para utiliarza la funcion dividir.
+	mov		bl,			al			; Muevo el resultado para utiliarza la funcion dividir.
 	mov     edx,        msj2		; Mostrar mensaje
 	call    puts
-	call	printHex				; Mostrar operación
+	call	printHex				; Mostrar resultado anterior guardado en al
 	mov     al,        '/' 
 	call    putchar
-	; mov		al,		num2
-	; mov		al,			48
+	mov		al,			[num2]
+	call    printHex
+	mov     al,        	'='
 	call    putchar
-	mov     al,        '='
-	call    putchar
-	mov		ebx, 		num2
-	add		byte[ebx],		48
-	mov		dl, 		[ebx]
+	mov		edx, 		num2
+	mov 	eax,		0
+	mov		cl,			[edx]
+	mov		eax,		0
 	call	divi
-	mov		eax,		0			; Limpiar registros
-	mov 	esi, 		cad			; Es necesario para utilizar printHex
 	call	printHex
 	call 	salto
 	; -------------- 3 - Para numeros 0 al 100 --------------
-	mov     edx,        msj3		; Mostrar mensaje 1
+	mov     edx,        msj3		; Mostrar mensaje
 	call    puts
 	mov 	dh, 100
 	mov		dl, 0
 	call numeros
 	call salto
-	;-------------- 4 - Para numeros pares --------------
-	mov     edx,        msj4		; Mostrar mensaje 1
+	; -------------- 4 - Para numeros pares --------------
+	mov     edx,        msj4		; Mostrar mensaje
 	call    puts
-	mov 	dh, 100
 	mov		dl, 0
-	call numPares
-	call salto
+	mov 	dh, 100
+	call 	numPares
+	call 	salto
+	;-------------- utilizar num1 como badera --------------
+	mov		edx,	num1
+	mov		ecx, 1
+	mov		[edx],	ecx
+	prueba2:
+
 	;-------------- 5 - Capturar texto --------------
 	mov     edx,    msj5		; Mostrar mensaje 1
 	call    puts
 	mov		ebx, 	cadena
 	call	capturarTxt
 	;-------------- 6 - Palindromo --------------
+
 	mov     edx,	msj6	; Mostrar mensaje
 	call    puts
 	call 	palindromo
@@ -118,33 +124,42 @@ _start:
 	mov     edx,	msj7	; Mostrar mensaje
 	call    puts
 	fin:
+
+
+	;-------------- Probar otro palindromo --------------
+	mov		edx,	num1
+	mov 	eax, 	[edx]
+	cmp		eax,	0
+	je		fin2
+	sub		eax,	1
+	jmp		prueba2
+	fin2:
 	;-------------- Fin --------------
 	mov     eax,        1	;Carga la instruccion de salida de programa.
 	mov     ebx,        0	;Indica que termino correctamente, como un return 0 en c.
 	int     80h				;Llamada a kener con las anteriores mensajes. Fin del programa main.
 
 multi:
-	; Entrada: 	CL	->	Veces que se repite la suma.
-	; 			CH	->	numero a sumar
-	; Salida:   Al	->	Resultado
+	; Entrada: 	cl	->	Veces que se repite la suma.
+	; 			bl	->	numero a sumar
+	; Salida:   al	->	Resultado
 	mov		al, 0			;Limpiar todo el registro eax porque ahi guardamos el resultado.
 	.ciclo:
-		add     al,ch		; Multiplicar es sumar tantas veces el mismo numero.
-		loop .ciclo			; Esta funcion revisa el registo ecx y en automatico decrementa. Solo decrementa cl
+		add     al,bl		; Multiplicar es sumar tantas veces el mismo numero.
+		loop .ciclo			; Esta funcion revisa el registo ecx y en automatico decrementa. Solo decrementa ebx
 	ret
 
 divi:
-	;	Entrada:  DL -> Divisor
-	;             DH -> Dividendo
-	;	Salida:   AL -> Resultado
-    mov eax, 0				; cociente = 0
+	;	Entrada:  cl -> Divisor
+	;             bl -> Dividendo
+	;	Salida:   al-> Resultado
+    mov al, 0				; cociente = 0
 	.bucle:
-		cmp dl, dh			; Dividendo es menor que divisor
+		cmp bl, cl			; Dividendo es menor que divisor
 		jb .fin_divi		; Si es menor, terminamos
-		sub dl, dh			; Dividendo -= divisor
+		sub bl, cl			; Dividendo -= divisor
 		inc al				; cociente++
 		jmp .bucle
-
 	.fin_divi:
     ret
 
@@ -156,8 +171,8 @@ numPares:
 		cmp 	dh, dl			; Dividendo es menor que divisor	
 		jb 		.fin_divi		; Si es menor, terminamos
 		mov 	al, 		dl
-		call 	salto
 		call	printHex
+		call 	salto
 		add 	dl, 2        ; Dividendo -= divisor
 		jmp .bucle
 	.fin_divi:
@@ -171,8 +186,8 @@ numeros:
 		cmp 	dh, dl			; Dividendo es menor que divisor	
 		jb 		.fin_divi		; Si es menor, terminamos
 		mov 	al, 		dl
-		call 	salto
 		call	printHex
+		call 	salto
 		add 	dl, 1        ; Dividendo -= divisor
 		jmp .bucle
 	.fin_divi:
@@ -203,13 +218,13 @@ palindromo:
 	dec  	edi			; Quiene
 	mov		esi, 	0
 	ciclo:
-		mov ah,	[ebx + edi]
-		mov al, [ebx + esi]
-		cmp ah,	al
+		mov ah,		[ebx + edi]
+		mov al, 	[ebx + esi]
+		cmp ah,		al
 		jne fin_ciclo
 		dec edi
 		inc esi
-		cmp edi, esi
+		cmp edi, 	esi
 		je sies
 		jmp ciclo
 	sies:
