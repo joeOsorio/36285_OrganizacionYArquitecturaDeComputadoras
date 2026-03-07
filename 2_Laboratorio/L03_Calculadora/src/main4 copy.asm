@@ -60,7 +60,7 @@ _start:
 	mov		edx, 		num2
 	mov 	bl, 		[edx]
 	mov		eax, 		0			; Limpiar el registro completo para multi y printHex
-	call 	multiplicar					; Como el resultado lo regresa en al ya no es necesario cargar en eax solo limpiarlo. 
+	call 	multi					; Como el resultado lo regresa en al ya no es necesario cargar en eax solo limpiarlo. 
 	mov 	esi, 		cad			; Es necesario para utilizar printHex
 	call	printHex
 	call 	salto
@@ -122,15 +122,15 @@ _start:
 	mov     ebx,        0	;Indica que termino correctamente, como un return 0 en c.
 	int     80h				;Llamada a kener con las anteriores mensajes. Fin del programa main.
 
-multiplicar:
+multi:
 	; Entrada: 	cl	->	Veces que se repite la suma.
 	; 			bl	->	numero a sumar
 	; Salida:   al	->	Resultado
 	mov 	al, 		0			;Limpiar todo el registro eax porque ahi guardamos el resultado.
 	je      .fin_multi
 	.cicloMulti:
-		add  al,		bl			; Multiplicar es sumar tantas veces el mismo numero.
-		loop .cicloMulti			; Esta funcion revisa el registo ecx y en automatico decrementa. Solo decrementa ebx
+		add  al,		bl		; Multiplicar es sumar tantas veces el mismo numero.
+		loop .ciclo			; Esta funcion revisa el registo ecx y en automatico decrementa. Solo decrementa ebx
 	.fin_multi:
 	ret
 
@@ -138,13 +138,13 @@ divi:
 	;	Entrada:  cl -> Divisor
 	;             bl -> Dividendo
 	;	Salida:   al-> Resultado
-    mov al, 		0		; cociente = 0
-	.ciclo_div:
-		cmp bl, 	cl		; Dividendo es menor que divisor
-		jb 	.fin_divi		; Si es menor, terminamos
-		sub bl, 	cl		; Dividendo -= divisor
-		inc	al				; cociente++
-		jmp	.ciclo_div
+    mov al, 0				; cociente = 0
+	.bucle:
+		cmp bl, 		cl			; Dividendo es menor que divisor
+		jb .fin_divi		; Si es menor, terminamos
+		sub bl, 		cl			; Dividendo -= divisor
+		inc al				; cociente++
+		jmp .bucle
 	.fin_divi:
     ret
 
