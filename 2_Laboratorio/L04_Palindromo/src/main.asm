@@ -13,9 +13,12 @@
 
 section .data						;Datos inicializados
 	msj1:	db	"Programa para capturar texto", 10, 0
+	msj22:	db	"Cadena capturada:", 0
 	msj2:	db	"programa para saber si es o no Palindromo ", 10, 0
 	msj3:	db	"Si es palindromo", 10, 0
+	len3:	equ	$-msj3
 	msj4:	db	"No es palindromo", 10, 0
+	len4:	equ	$-msj4
 
 section .bss						;Datos no inicializados
 	cadena 		resb 	254
@@ -29,6 +32,7 @@ _start:
 	;-------------- 1 - Capturar cadena --------------
 	mov     edx,    msj1		; Mostrar mensaje 1
 	call    puts
+	mov		ecx, 	254
 	mov		edx, 	cadena
 	call	inputStr			; Capturar y luego mostrar
 	;-------------- Punto 3: Verificar palindromo --------------
@@ -42,37 +46,50 @@ _start:
 	int     80h				;Llamada a kener con las anteriores mensajes. Fin del programa main.
 
 inputStr:
-	; Entrada:	EDX	-> Direccion de la variable.
-	; Modifica: eax, ebx, ecx, edx, esi, edi
-	; Salida:	AL	-> Caracter capturado.
-	; 			EDI -> longitud de cadena.
+	; Entrada:	EDX	-> 	Direccion de la variable.
+	;			ECX	-> 	logitud de cadena		
+	; Salida:	AL	-> 	Caracter capturado.
+	; 			EDI -> 	longitud de cadena.
 	mov		edi, 0
 	.ciclo_captura:
-		call	getch
-		cmp 	al, 	'+'			; Compara con el salto de linea para terminar la captura.
+		cmp		edi,	ecx
+		je		.fin_captura2
+		call	getche
+		cmp 	al, 	'+'			; Compara con el caracter + para terminar la captura.
+		mov 	[edx + edi], 	al
 		je 		.fin_captura
-		mov 	[ebx + edi], 	al
 		inc 	edi
 		jmp 	.ciclo_captura
 	.fin_captura:
-		mov 	byte[edx + edi + 1], 	0
+		mov 	byte[edx + edi + 1], 0 ; Agrego 0 para poder utilizar puts
+		call	salto
+		call	salto
+		; call 	puts	
+		; mov     edx,		msj22	; Mostrar mensaje
+		; call    puts
+
+		mov		bh, edig
+		call	gotoxy 
 		call	outputStr
+		call 	salto
+		call 	salto
+	.fin_captura2: ; Para cadenas de logitud 0
 	ret
 
 outputStr:
 	; Entrada:	EDX 		->	Dir de la variable.
 	;			EDI 		->	Longitud cadena
-	; utiliza:	AL
+	; utiliza:	ESI
 	; Salida:	Terminal	->	Muestra en terminal la cadena. 	
 	mov esi,	0
 	.ciclo_mostrar:
 		cmp 	esi, 	edi		; Compara con el salto de linea para terminar la captura.
 		je 		.fin_mostrar
-		cmp		byte[ebx + esi], 				'0'
+		mov		al,		[edx + esi]
+		cmp		al, 				'+'
 		je		.fin_mostrar
-		mov		al,		[eax]
 		call	putchar
-		inc		edi
+		inc		esi
 		jmp		.ciclo_mostrar
 	.fin_mostrar:
 	ret
@@ -87,9 +104,10 @@ palindromo:
     cmp		edi, 	0
     je		.no_palindromo
     mov 	esi, 	0                   ; índice izquierdo
+	dec		edi
 	.ciclo_palindromo:
 		cmp 	esi,	edi
-		jge 	.es_palindromo           ; Si se cruzaron o son iguales, es palíndromo
+		je 		.es_palindromo           ; Si se cruzaron o son iguales, es palíndromo
 		mov 	al,		[edx + esi]
 		mov 	ah ,	[edx + edi]
 		cmp 	al,		ah 
@@ -99,12 +117,15 @@ palindromo:
 		jmp 	.ciclo_palindromo
 	.es_palindromo:
 		mov 	edx, 	msj3
-		call 	outputStr
+		mov		edi, 	len3
+		call 	outputStr		;no utiliza prin
+		; call 	puts		;no utiliza prin
 		ret
 	.no_palindromo:
-		pop 	edx
 		mov 	edx, 	msj4
-		call 	outputStr
+		mov		edi, 	len4
+		call 	outputStr		;no utiliza prin
+		; call 	puts
 		ret
 ret
 
@@ -133,35 +154,3 @@ salto:
 	call    putchar
 	popad
 	ret
-
-printHex:
-;	Entrada:	EAX -> Valor a convertir.
-;				ESI -> Necesita una cadena de minimo 10 byte's.
-;	Salida:		Muestra valor en consola.
-  pushad
-  mov edx, eax
-  mov ebx, 0fh
-  mov cl, 28
-.nxt: shr eax,cl
-.msk: and eax,ebx
-  cmp al, 9
-  jbe .menor
-  add al,7
-.menor:add al,'0'
-  mov byte [esi],al
-  inc esi
-  mov eax, edx
-  cmp cl, 0
-  je .print
-  sub cl, 4
-  cmp cl, 0
-  ja .nxt
-  je .msk
-.print: mov eax, 4
-  mov ebx, 1
-  sub esi, 8
-  mov ecx, esi
-  mov edx, 8
-  int 80h
-  popad
-  ret
