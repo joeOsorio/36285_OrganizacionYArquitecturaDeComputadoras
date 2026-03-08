@@ -63,3 +63,18 @@
 # *.mod*
 # *.cmd
 # dkms.conf
+
+
+
+# Archivos temporales de Word
+~$*.docx
+
+# Archivos de Word (opcional)
+# *.docx
+
+# Archivos temporales de Office
+~$*
+
+# Archivos temporales de Windows
+Thumbs.db
+Desktop.ini
