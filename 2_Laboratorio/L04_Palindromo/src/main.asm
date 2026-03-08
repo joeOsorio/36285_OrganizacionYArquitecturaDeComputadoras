@@ -63,15 +63,7 @@ inputStr:
 	.fin_captura:
 		mov 	byte[edx + edi + 1], 0 ; Agrego 0 para poder utilizar puts
 		call	salto
-		call	salto
-		; call 	puts	
-		; mov     edx,		msj22	; Mostrar mensaje
-		; call    puts
-
-		mov		bh, edig
-		call	gotoxy 
 		call	outputStr
-		call 	salto
 		call 	salto
 	.fin_captura2: ; Para cadenas de logitud 0
 	ret
