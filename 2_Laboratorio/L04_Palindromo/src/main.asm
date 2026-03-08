@@ -1,4 +1,7 @@
 ; Ensamblador NASM, formato ELF de 32 bits, para Linux.
+; Practica 5: Captura, visualización y detección de palíndromos.
+; Instrucciones permitidas: add, sub, mov, jmp, cmp, je, loop, getch, getche, puts, putchar, inc, dec.
+
 
 ; Notas: 
 ; - Direccion relativa en el repositorio.  >cd 2_Laboratorio/L04_Palindromo/
@@ -24,82 +27,101 @@ _start:
 	call    clrscr					; Limpiamos pantalla
 	call    salto
 	;-------------- 1 - Capturar cadena --------------
-	mov     edx,    msj5		; Mostrar mensaje 1
+	mov     edx,    msj1		; Mostrar mensaje 1
 	call    puts
-	mov		ebx, 	cadena
-	call	inputStr
-	;-------------- 2 - Palindromo --------------
-	mov     edx,	msj6	; Mostrar mensaje
+	mov		edx, 	cadena
+	call	inputStr			; Capturar y luego mostrar
+	;-------------- Punto 3: Verificar palindromo --------------
+	mov     edx,	msj2	; Mostrar mensaje
 	call    puts
+	mov		edx, 	cadena
 	call 	palindromo
-	cmp	edx, 1
-	je pal
-	mov     edx,	msj8	; Mostrar mensaje
-	call    puts
-	jmp fin
-	pal:
-	mov     edx,	msj7	; Mostrar mensaje
-	call    puts
-	fin:
 	;-------------- Fin --------------
 	mov     eax,        1	;Carga la instruccion de salida de programa.
 	mov     ebx,        0	;Indica que termino correctamente, como un return 0 en c.
 	int     80h				;Llamada a kener con las anteriores mensajes. Fin del programa main.
 
 inputStr:
-	; Entrada:	EDX	-> Dir de la variable.
+	; Entrada:	EDX	-> Direccion de la variable.
+	; Modifica: eax, ebx, ecx, edx, esi, edi
 	; Salida:	AL	-> Caracter capturado.
-	; 			EDI -> Acumuladro de cuento me desplace.
-	mov edi, 0
-	capturar:
-		call getche
-		cmp al, 10			; Compara con el salto de linea para terminar la captura.
-		je 	fin_captura
-		mov byte [ebx + edi], al
-		inc edi
-		jmp capturar
-	fin_captura:
+	; 			EDI -> longitud de cadena.
+	mov		edi, 0
+	.ciclo_captura:
+		call	getch
+		cmp 	al, 	'+'			; Compara con el salto de linea para terminar la captura.
+		je 		.fin_captura
+		mov 	[ebx + edi], 	al
+		inc 	edi
+		jmp 	.ciclo_captura
+	.fin_captura:
+		mov 	byte[edx + edi + 1], 	0
+		call	outputStr
 	ret
 
 outputStr:
-	; Entrada:	EBX -> 	Dir de la variable.
-	;			EDI ->	Longitud cadena
-	; Salida:	Terminal	-> Muestra en terminal la cadena. 	
+	; Entrada:	EDX 		->	Dir de la variable.
+	;			EDI 		->	Longitud cadena
+	; utiliza:	AL
+	; Salida:	Terminal	->	Muestra en terminal la cadena. 	
 	mov esi,	0
-	mstCad:
-		cmp esi, edi			; Compara con el salto de linea para terminar la captura.
-		je 	fin_captura
-		cmp	[ebx], '0'
-		je 	fin_captura
-
-		
-		mov byte [ebx + esi], al
-		inc edi
-		jmp capturar
-	fin_mstCad:
+	.ciclo_mostrar:
+		cmp 	esi, 	edi		; Compara con el salto de linea para terminar la captura.
+		je 		.fin_mostrar
+		cmp		byte[ebx + esi], 				'0'
+		je		.fin_mostrar
+		mov		al,		[eax]
+		call	putchar
+		inc		edi
+		jmp		.ciclo_mostrar
+	.fin_mostrar:
 	ret
 
 palindromo:
-	; Entrada:	EBX -> Direccion de la cadena a evaluar. 
+	; Entrada:	EDX -> Direccion de la cadena a evaluar. 
 	;			EDI -> Longitud de cadena
 	; Utiliza:	ESI
 	; Salida:	DL bandera que indica 0: No palindromo, 1: Si palindromo
-	mov 	edx,	0	; Bandera
-	dec  	edi			; Quiene
-	mov		esi, 	0
-	ciclo:
-		mov ah,		[ebx + edi]
-		mov al, 	[ebx + esi]
-		cmp ah,		al
-		jne fin_ciclo
-		dec edi
-		inc esi
-		cmp edi, 	esi
-		je sies
-		jmp ciclo
-	sies:
-		mov edx, 1
-	fin_ciclo:
+    
+	; Si la cadena está vacía, es palíndromo
+    cmp		edi, 	0
+    je		.no_palindromo
+    mov 	esi, 	0                   ; índice izquierdo
+	.ciclo_palindromo:
+		cmp 	esi,	edi
+		jge 	.es_palindromo           ; Si se cruzaron o son iguales, es palíndromo
+		mov 	al,		[edx + esi]
+		mov 	ah ,	[edx + edi]
+		cmp 	al,		ah 
+		jne 	.no_palindromo
+		inc 	esi
+		dec 	edi
+		jmp 	.ciclo_palindromo
+	.es_palindromo:
+		mov 	edx, 	msj3
+		call 	outputStr
+		ret
+	.no_palindromo:
+		pop 	edx
+		mov 	edx, 	msj4
+		call 	outputStr
+		ret
+ret
+
+string_len:
+	; Entrada:	EDX -> Direccion de la cadena a evaluar. 
+	;			EDI -> Longitud de cadena sin contemplar 0
+	; Utiliza:	ESI y Al
+	; Salida:
+	mov		esi,	edx
+	mov		edi, 	0
+	.ciclo_len:
+		mov al, 	[esi + edi]
+		cmp al, 	0
+		je 	.fin_ciclo_len
+		inc	edi
+		jmp .ciclo_len
+	.fin_ciclo_len:
 ret
 
 salto:
