@@ -3,7 +3,6 @@
 ; Instrucciones permitidas: add, sub, mov, jmp, cmp, je, loop, getch, getche, puts, putchar, inc, dec.
 
 ;cd 2_Laboratorio/L05_Tema/
-;
 %include "./pc_io.inc"
 
 section .data
