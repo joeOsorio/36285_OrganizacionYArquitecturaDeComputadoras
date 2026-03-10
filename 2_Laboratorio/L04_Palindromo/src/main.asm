@@ -32,11 +32,11 @@ _start:
 	;-------------- 1 - Capturar cadena --------------
 	mov     edx,    msj1		; Mostrar mensaje 1
 	call    puts
-	mov		ecx, 	254
+	mov		ecx, 	254			; Cargar el tamaño de cadena.
 	mov		edx, 	cadena
 	call	inputStr			; Capturar y luego mostrar
 	;-------------- Punto 3: Verificar palindromo --------------
-	mov     edx,	msj2	; Mostrar mensaje
+	mov     edx,	msj2		; Mostrar mensaje
 	call    puts
 	mov		edx, 	cadena
 	call 	palindromo
@@ -95,11 +95,11 @@ palindromo:
 	; Si la cadena está vacía, es palíndromo
     cmp		edi, 	0
     je		.no_palindromo
-    mov 	esi, 	0                   ; índice izquierdo
+    mov 	esi, 	0               ; índice izquierdo
 	dec		edi
 	.ciclo_palindromo:
 		cmp 	esi,	edi
-		je 		.es_palindromo           ; Si se cruzaron o son iguales, es palíndromo
+		je 		.es_palindromo		; Si se cruzaron o son iguales, es palíndromo
 		mov 	al,		[edx + esi]
 		mov 	ah ,	[edx + edi]
 		cmp 	al,		ah 

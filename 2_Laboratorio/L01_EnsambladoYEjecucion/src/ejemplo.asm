@@ -1,3 +1,4 @@
+; Primera practica de OAC ver como es mi primer HOLA MUNDO sus elemento y componentes.
 	global  _start
 	section .text
 _start:

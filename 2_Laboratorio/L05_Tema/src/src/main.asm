@@ -2,8 +2,8 @@
 ; Practica 5: Captura, visualización y detección de palíndromos.
 ; Instrucciones permitidas: add, sub, mov, jmp, cmp, je, loop, getch, getche, puts, putchar, inc, dec.
 
-
-
+;cd 2_Laboratorio/L05_Tema/
+;
 %include "./pc_io.inc"
 
 section .data
@@ -26,7 +26,8 @@ _start:
     call puts
     call getche
     sub al, 48
-    mov ebx, al
+    mov ebx, num
+    mov [ebx], al
     call salto
     call imprime
     call salto
@@ -57,3 +58,13 @@ imprime:
         jmp .ciclo_imprime
     .fin_imprime:
 ret
+
+
+salto:
+	pushad
+	mov     al,         13
+	call    putchar
+	mov     al,         10
+	call    putchar
+	popad
+	ret
