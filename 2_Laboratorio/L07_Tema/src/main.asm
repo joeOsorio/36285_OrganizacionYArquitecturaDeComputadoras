@@ -19,11 +19,27 @@ _start:
     mov edx, msj1              
     call puts
     mov ebx, cadena
-    mov edx, [ebx]
-    call inputStr
-    mov ebx, cadena
     mov edx, ebx
-    call outputStr
+    call inputStr
+    call print
+    call salto
+    mov edx, ebx
+    call invert
+    ; mov edx, ebx
+    ; call print
+
+    ; mov edx, cadena
+
+    ; mov ebx, cadena
+    ; mov edx, [ebx]
+    ; call puts
+    ; mov ebx, cadena
+    ; mov edi, eax
+    ; mov edx, [ebx]
+    ; call invert
+    ; mov edx, ebx
+    ; call puts
+    ; mov edx, ebx
     call salto
 
     ; call puts
@@ -34,54 +50,65 @@ retunr0:
 
 inputStr:
 ; Entrada:  edx = Direccion donde guardar.
-; Salida:   eax = Longitud.
+; Salida:   edi = Longitud.
 ; Modifica: esi
-    push edx                        ; Guardamos la dirección original
-    mov esi, 0                    ; esi = contador de caracteres
+    push edx
+    push edi                        ; Guardamos la dirección original
+    mov edi, 0                    ; edi = contador de caracteres
     .ciclo_inputStr:
         call getche                 ; Lee carácter con eco
         cmp al, 10                  ; ¿Es Enter?
         je .fin_intputStr
-        mov[ebx + esi], al         ; Almacena en buffer
-        inc esi
+        mov byte[edx + edi], al         ; Almacena en buffer
+        inc edi
         jmp .ciclo_inputStr
     .fin_intputStr:
-        mov byte[ebx + esi], 0      ; Terminador nulo
-        mov eax, esi                 ; Longitud en eax
+        mov byte[edx + edi], 0      ; Terminador nulo
+        pop edi
         pop edx                      ; Recuperamos dirección original
 ret
 
-outputStr:
+print:
 ; Entrada:  edx = dirección de una cadena terminada en 0.
 ; Salida:   Terminal = Imprime la cadena en la terminal.
 ; Modifica: 
     push edx
-    .ciclo_muestra:
+    .ciclo_print:
         mov al, [edx]               ; Toma un carácter
         cmp al, 0                   ; Fin de cadena?
-        je .fin_muestra
+        je .fin_print
         call putchar                ; Lo imprime
         inc edx                     ; Siguiente carácter
-        jmp .ciclo_muestra
-    .fin_muestra:
+        jmp .ciclo_print
+    .fin_print:
     pop edx
 ret
 
 
-outputStrInvert:
+invert:
 ; Entrada:  edx = dirección de una cadena terminada en 0.
+;           cx = logitud de la cadena
 ; Salida:   Terminal = Imprime la cadena en la terminal.
 ; Modifica: 
     push edx
-    .ciclo_OSI:
-        mov al, [edx]               ; Toma un carácter
-        cmp al, 0                   ; Fin de cadena?
-        je .fin_muestra
-        call putchar                ; Lo imprime
-        inc edx                     ; Siguiente carácter
-        jmp .ciclo_muestra
-    .fin_ciclo_:
-    pop edx
+    dec edi
+    mov esi, 0
+    .ciclo_Invert:
+        cmp esi, edi
+        je .fin_invert
+        mov bl , [edx+esi]
+        mov al, bl
+        call putchar
+        mov bh , [edx+edi]
+        mov al, bh
+        call putchar
+        mov byte[edx+esi] , bh
+        mov byte[edx+edi] , bl
+        inc esi
+        dec edi
+        jmp .ciclo_Invert
+    .fin_invert:
+        pop edx
 ret
 
 salto:
