@@ -77,7 +77,7 @@ mostrarCadena:
 	mstCad:
 		cmp esi, edi			; Compara con el salto de linea para terminar la captura.
 		je 	fin_captura
-		cmp	[ebx], '0'
+		cmp	byte[ebx], '0'
 		je 	fin_captura
 
 		
@@ -119,35 +119,3 @@ salto:
 	call    putchar
 	popad
 	ret
-
-printHex:
-;	Entrada:	EAX -> Valor a convertir.
-;				ESI -> Necesita una cadena de minimo 10 byte's.
-;	Salida:		Muestra valor en consola.
-  pushad
-  mov edx, eax
-  mov ebx, 0fh
-  mov cl, 28
-.nxt: shr eax,cl
-.msk: and eax,ebx
-  cmp al, 9
-  jbe .menor
-  add al,7
-.menor:add al,'0'
-  mov byte [esi],al
-  inc esi
-  mov eax, edx
-  cmp cl, 0
-  je .print
-  sub cl, 4
-  cmp cl, 0
-  ja .nxt
-  je .msk
-.print: mov eax, 4
-  mov ebx, 1
-  sub esi, 8
-  mov ecx, esi
-  mov edx, 8
-  int 80h
-  popad
-  ret
