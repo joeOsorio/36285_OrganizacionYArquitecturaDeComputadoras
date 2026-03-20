@@ -61,3 +61,6 @@ Para que NASM pueda localizar correctamente los archivos incluidos (.inc), se es
 ### codigo bash
 
 nasm -f elf32 -Isrc/LIB src/main.asm -o out/main.o
+
+
+Para derle perimisos a buil : chmod +x build.sh

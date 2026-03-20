@@ -315,3 +315,13 @@ Hola Joshua
 ---
 
 > Documento pensado para **prácticas académicas de Ensamblador x86 (IA-32)**.
+
+
+
+je igual
+jne diferente
+jmp Realiza simpre el salto.
+
+Registros de direccionamiento 
+ESI Origen
+EDI Destino

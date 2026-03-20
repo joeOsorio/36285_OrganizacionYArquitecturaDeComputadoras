@@ -1,4 +1,3 @@
-
 ; Nota: direccion relativa en el repositorio.  >cd 2_Laboratorio/L02_Introduccion
 
 %include "./pc_io.inc"

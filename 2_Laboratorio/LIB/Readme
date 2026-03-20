@@ -1,0 +1,212 @@
+# 🧠 Arquitectura y Organización de Computadoras
+
+## 📌 Ensamblador x86 (Intel 80386 - 32 bits)
+
+Este repositorio contiene ejemplos, rutinas y guía básica para trabajar con **ensamblador x86 de 32 bits (NASM)** en sistemas Linux, utilizando llamadas al sistema mediante `int 80h`.
+
+---
+
+# 🚀 Ejemplo básico: "Hello World"
+
+```asm
+global _start
+
+section .text
+_start:
+    ; sys_write(stdout, message, length)
+    mov eax, 4          ; syscall: sys_write
+    mov ebx, 1          ; file descriptor: stdout
+    mov ecx, message    ; dirección del mensaje
+    mov edx, length     ; longitud del mensaje
+    int 80h
+
+    ; sys_exit(return_code)
+    mov eax, 1          ; syscall: sys_exit
+    mov ebx, 0          ; código de salida (0 = éxito)
+    int 80h
+
+section .data
+    message: db 'Hello, world!', 0x0A   ; mensaje con salto de línea
+    length: equ $ - message             ; longitud del mensaje
+```
+
+---
+
+# ⚙️ Compilación y ejecución
+
+## 🧩 Ensamblar
+
+```bash
+nasm -f elf archivo.asm -o archivo.o
+```
+
+## 🔗 Enlazar
+
+```bash
+ld -m elf_i386 archivo.o -o programa
+```
+
+## ▶️ Ejecutar
+
+```bash
+./programa
+```
+
+---
+
+# 📚 Uso de librerías externas
+
+Para incluir funciones auxiliares (como manejo de consola):
+
+```asm
+%include "./LIB/pc_io.inc"
+```
+
+## Compilación con librería:
+
+```bash
+nasm -f elf entrada.asm -o entrada.o
+ld -m elf_i386 -s -o entrada entrada.o LIB/libpc_io.a
+```
+
+---
+
+# 🧩 Rutinas disponibles
+
+## 🖥️ `clrscr`
+
+Limpia la pantalla.
+
+* **Entrada:** Ninguna
+* **Salida:** Ninguna
+
+---
+
+## 📍 `gotoxy`
+
+Posiciona el cursor en pantalla.
+
+* **Entrada:**
+
+  * `BH` → columna (x)
+  * `BL` → fila (y)
+* **Salida:** Ninguna
+
+---
+
+## 🔤 `putchar`
+
+Imprime un carácter.
+
+* **Entrada:**
+
+  * `AL` → carácter a mostrar
+* **Salida:** Ninguna
+
+---
+
+## 📝 `puts`
+
+Imprime una cadena de texto.
+
+* **Entrada:**
+
+  * `EDX` → apuntador a la cadena
+* **Salida:** Ninguna
+
+---
+
+## ⌨️ `getche`
+
+Lee un carácter y lo muestra en pantalla.
+
+* **Entrada:** Ninguna
+* **Salida:**
+
+  * `AL` → carácter leído
+
+---
+
+## 🔒 `getch`
+
+Lee un carácter sin mostrarlo.
+
+* **Entrada:** Ninguna
+* **Salida:**
+
+  * `AL` → carácter leído
+
+---
+
+# 🧪 Rutina adicional: imprimir en hexadecimal
+
+Convierte el valor en `EAX` a formato hexadecimal y lo imprime.
+
+```asm
+printHex:
+  pushad
+  mov edx, eax
+  mov ebx, 0fh
+  mov cl, 28
+
+.nxt:
+  shr eax, cl
+
+.msk:
+  and eax, ebx
+  cmp al, 9
+  jbe .menor
+  add al, 7
+
+.menor:
+  add al, '0'
+  mov byte [esi], al
+  inc esi
+
+  mov eax, edx
+  cmp cl, 0
+  je .print
+
+  sub cl, 4
+  cmp cl, 0
+  ja .nxt
+  je .msk
+
+.print:
+  mov eax, 4
+  mov ebx, 1
+  sub esi, 8
+  mov ecx, esi
+  mov edx, 8
+  int 80h
+
+  popad
+  ret
+```
+
+---
+
+# 🧠 Conceptos clave que se aplican
+
+Este proyecto refuerza temas fundamentales de OAC:
+
+* Uso de registros (`EAX`, `EBX`, `ECX`, `EDX`)
+* Llamadas al sistema (`int 80h`)
+* Manejo de memoria
+* Segmentos (`.text`, `.data`)
+* Paso de parámetros por registros
+* Control de flujo (saltos y etiquetas)
+
+---
+
+# ⚠️ Notas importantes
+
+* Este código está diseñado para **Linux 32 bits (ELF)**
+* Usa **llamadas al sistema antiguas (`int 80h`)**, útiles para aprendizaje
+* En sistemas modernos puede requerir:
+
+  ```bash
+  sudo apt install gcc-multilib
+  ```
+
+---
