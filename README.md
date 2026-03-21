@@ -1,4 +1,4 @@
-# 📘 Nombre de la Materia
+`# 📘 Nombre de la Materia
 
 Repositorio académico de la materia **Nombre de la Materia** de la carrera de **Ingeniería en Computación**.
 

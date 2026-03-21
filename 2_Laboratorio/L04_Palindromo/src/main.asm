@@ -62,9 +62,9 @@ inputStr:
 		jmp 	.ciclo_captura
 	.fin_captura:
 		mov 	byte[edx + edi + 1], 0 ; Agrego 0 para poder utilizar puts
-		call	salto
-		call	outputStr
-		call 	salto
+		; call	salto
+		; call	outputStr
+		; call 	salto
 	.fin_captura2: ; Para cadenas de logitud 0
 	ret
 

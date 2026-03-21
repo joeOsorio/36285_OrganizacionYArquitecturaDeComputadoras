@@ -77,8 +77,8 @@ ld -m elf_i386 -s -o entrada entrada.o LIB/libpc_io.a
 
 Limpia la pantalla.
 
-* **Entrada:** Ninguna
-* **Salida:** Ninguna
+- **Entrada:** Ninguna
+- **Salida:** Ninguna
 
 ---
 
@@ -86,11 +86,11 @@ Limpia la pantalla.
 
 Posiciona el cursor en pantalla.
 
-* **Entrada:**
+- **Entrada:**
+  - `BH` → columna (x)
+  - `BL` → fila (y)
 
-  * `BH` → columna (x)
-  * `BL` → fila (y)
-* **Salida:** Ninguna
+- **Salida:** Ninguna
 
 ---
 
@@ -98,10 +98,10 @@ Posiciona el cursor en pantalla.
 
 Imprime un carácter.
 
-* **Entrada:**
+- **Entrada:**
+  - `AL` → carácter a mostrar
 
-  * `AL` → carácter a mostrar
-* **Salida:** Ninguna
+- **Salida:** Ninguna
 
 ---
 
@@ -109,10 +109,10 @@ Imprime un carácter.
 
 Imprime una cadena de texto.
 
-* **Entrada:**
+- **Entrada:**
+  - `EDX` → apuntador a la cadena
 
-  * `EDX` → apuntador a la cadena
-* **Salida:** Ninguna
+- **Salida:** Ninguna
 
 ---
 
@@ -120,10 +120,9 @@ Imprime una cadena de texto.
 
 Lee un carácter y lo muestra en pantalla.
 
-* **Entrada:** Ninguna
-* **Salida:**
-
-  * `AL` → carácter leído
+- **Entrada:** Ninguna
+- **Salida:**
+  - `AL` → carácter leído
 
 ---
 
@@ -131,16 +130,16 @@ Lee un carácter y lo muestra en pantalla.
 
 Lee un carácter sin mostrarlo.
 
-* **Entrada:** Ninguna
-* **Salida:**
-
-  * `AL` → carácter leído
+- **Entrada:** Ninguna
+- **Salida:**
+  - `AL` → carácter leído
 
 ---
 
 # 🧪 Rutina adicional: imprimir en hexadecimal
 
 Convierte el valor en `EAX` a formato hexadecimal y lo imprime.
+tabien ocupa una cadena de minimo 8 bytes, en esi
 
 ```asm
 printHex:
@@ -190,20 +189,20 @@ printHex:
 
 Este proyecto refuerza temas fundamentales de OAC:
 
-* Uso de registros (`EAX`, `EBX`, `ECX`, `EDX`)
-* Llamadas al sistema (`int 80h`)
-* Manejo de memoria
-* Segmentos (`.text`, `.data`)
-* Paso de parámetros por registros
-* Control de flujo (saltos y etiquetas)
+- Uso de registros (`EAX`, `EBX`, `ECX`, `EDX`)
+- Llamadas al sistema (`int 80h`)
+- Manejo de memoria
+- Segmentos (`.text`, `.data`)
+- Paso de parámetros por registros
+- Control de flujo (saltos y etiquetas)
 
 ---
 
 # ⚠️ Notas importantes
 
-* Este código está diseñado para **Linux 32 bits (ELF)**
-* Usa **llamadas al sistema antiguas (`int 80h`)**, útiles para aprendizaje
-* En sistemas modernos puede requerir:
+- Este código está diseñado para **Linux 32 bits (ELF)**
+- Usa **llamadas al sistema antiguas (`int 80h`)**, útiles para aprendizaje
+- En sistemas modernos puede requerir:
 
   ```bash
   sudo apt install gcc-multilib

@@ -104,7 +104,7 @@ palindromo:
 ret
 
 outputStr:
-	; Entrada:	EDX 		->	Dir de la variable.
+	; Entrada:	edx 		->	Dir de la variable.
 	;			EDI 		->	Longitud cadena
 	; utiliza:	ESI
 	; Salida:	Terminal	->	Muestra en terminal la cadena. 	
@@ -113,7 +113,8 @@ outputStr:
 		cmp 	esi, 	edi		; Compara con el salto de linea para terminar la captura.
 		je 		.fin_mostrar
 		mov		al,		[edx + esi]
-		cmp		al, 				'+'   ; caracter especial para finalizar cadena
+		cmp		al, 				0
+		; cmp		al, 				'+'   ; caracter especial para finalizar cadena
 		je		.fin_mostrar
 		call	putchar
 		inc		esi
@@ -132,14 +133,14 @@ inputStr:
 		je		.fin_captura2
 		call	getche
 		cmp 	al, 	'+'			; Compara con el caracter + para terminar la captura.
-		mov 	[edx + edi], 	al
 		je 		.fin_captura
+		mov 	[edx + edi], 	al
 		inc 	edi
 		jmp 	.ciclo_captura
 	.fin_captura:
 		mov 	byte[edx + edi + 1], 0 ; Agrego 0 para poder utilizar puts
-		call	salto
-		call	outputStr
+		; call	salto
+		; call	outputStr
 		call 	salto
 	.fin_captura2: ; Para cadenas de logitud 0
 ret
