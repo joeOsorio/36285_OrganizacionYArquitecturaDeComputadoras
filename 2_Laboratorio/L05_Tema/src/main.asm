@@ -16,6 +16,7 @@ section .data
 
 section .bss
     cadena      resb    254
+    cadena2      resb    254
     temp        resb    8
     letra       resb    1
 
@@ -34,11 +35,18 @@ _start:
     mov     edx,        cadena
     mov     ecx,        254     ; Se indica la longitud de cadena.
     call    inputStr
-    call    buscarLetra
-
-    mov     edx,        paso2
+    ; call    buscarLetra
+    mov     edx,        paso2   ; Mostrar mensaje.
     call    puts
-
+    mov     edx,        cadena
+    mov     edi,        cadena2
+    call    invertir
+    mov     edx,    cadena
+    call    puts
+    call    salto
+    mov     edx,    cadena2
+    call    puts
+    call    salto
     mov     eax,    1
     mov     ebx,    0
     int     80h 
@@ -89,6 +97,37 @@ buscarLetra:
         pop     esi
         mov     edx,    msj33
         call    puts
-        call    salto
 ret
-    
+
+invertir:
+;   Entrada:    edx = dir origen
+;               edi = dir destino
+;   Utiliza:
+;   Salida:
+;   Nota: La cadena oringen debe finalizar con caracter nulo
+    push    edx
+    push    edi
+    mov     ecx, 0      ;Limpiar registro.
+    mov     esi, 0
+    .ciclo_push:
+        mov     cl, [edx]
+        cmp     cl, 0
+        je      .ciclo_pop
+        inc     edx
+        inc     esi
+        push    ecx
+        jmp     .ciclo_push
+    .ciclo_pop:
+        cmp     esi, 0
+        je      .fin_invert
+        pop     ecx
+        mov     byte[edi], cl
+        inc     edi
+        dec     esi
+        jmp     .ciclo_pop
+    .fin_invert:
+        inc edi
+        mov byte[edi], 0
+    pop edx
+    pop edi
+ret
