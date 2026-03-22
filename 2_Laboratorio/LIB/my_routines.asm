@@ -19,12 +19,13 @@ print_newline:
     mov  ebx, 1
     mov  ecx, _newline
     mov  edx, 1
-    int  0x80
+    int  80h
     pop  edx
     pop  ecx
     pop  ebx
     pop  eax
     ret
+
 
 ; ------------------------------------------------------------
 ; print_spaces: imprime EBX espacios
@@ -177,6 +178,22 @@ printHex:
   int 80h
   popad
   ret
+
+new_puts:
+	; Entrada:	edx 		->	Dir de la cadena.
+	; 			Cana termina con caracter nulo.
+	; Salida:	Terminal	->	Muestra en terminal la cadena. 
+	push	edx			; Guardar la direccion en pila
+	.ciclo_new_puts:
+		mov		al,		[edx]	; Cargamos el primer caracter en al
+		cmp		al,		0		
+		je		.fin_new_puts
+		call	putchar
+		inc		edx
+		jmp		.ciclo_new_puts
+	.fin_new_puts:
+	pop	edx
+ret
 
 section .data
     _newline db 0x0A
