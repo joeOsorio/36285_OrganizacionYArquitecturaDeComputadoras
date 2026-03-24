@@ -15,10 +15,10 @@ print_newline:
     push ebx
     push ecx
     push edx
+    mov  edx, 1
     mov  eax, 4
     mov  ebx, 1
     mov  ecx, _newline
-    mov  edx, 1
     int  80h
     pop  edx
     pop  ecx

@@ -15,8 +15,12 @@ section .data
     paso3:  db  "Paso 3 - Uper casting", 10,0
     P3msj0: db  "Cadena original: ", 0
     P3msj1: db  "Cadena en mayusculas: ",0
-    paso4:  db  "Contrar vocales",0
+    paso4:  db  "Paso 4 - Contrar vocales",10, 0
     p4msj:  db  "Cadena a revisar: ",   0
+    p4msj0: db  "No se encontraron vocales"
+    p4msj1: db  "Se encontraron "
+    p4msj2: db  " vocales."
+    Caracter_voacales: db "AEIOU",0
 
 
 section .bss
@@ -24,6 +28,14 @@ section .bss
     cadena2      resb    254
     temp        resb    8
     letra       resb    1
+    ; Vocales
+    vocales     resb    1
+    vocal_A     resb    1
+    vocal_E     resb    1
+    vocal_I     resb    1
+    vocal_O     resb    1
+    vocal_U     resb    1
+
 
 section .text
     global _start
@@ -40,41 +52,49 @@ _start:
     mov     edx,        cadena
     mov     ecx,        254     ; Se indica la longitud de cadena.
     call    inputStr
-    call    buscarLetra
-    mov     edx,        paso2   ; Mostrar mensaje.
+    ; call    buscarLetra
+    ; mov     edx,        paso2   ; Mostrar mensaje.
+    ; call    new_puts
+    ; mov     edx,        cadena
+    ; mov     edi,        cadena2
+    ; call    invertir
+    ; mov     edx,    msj4
+    ; call    new_puts
+    ; mov     edx,    cadena
+    ; call    new_puts
+    ; call    salto
+    ; mov     edx,    msj5
+    ; call    new_puts
+    ; mov     edx,    cadena2
+    ; call    new_puts
+    ; call    salto
+    ; mov     edx,    paso3
+    ; call    new_puts
+    ; mov     edx,    P3msj0
+    ; call    new_puts
+    ; mov     edx,    cadena
+    ; call    new_puts
+    ; mov     edx,    cadena
+    ; call    salto
+    ; call    upperCase
+    ; mov     edx,    P3msj1
+    ; call    new_puts
+    ; mov     edx,    cadena
+    ; call    new_puts
+    ; call    salto
+    mov     edx,    paso4
     call    new_puts
-    mov     edx,        cadena
-    mov     edi,        cadena2
-    call    invertir
-    mov     edx,    msj4
+    mov     edx,    p4msj
     call    new_puts
     mov     edx,    cadena
     call    new_puts
     call    salto
-    mov     edx,    msj5
-    call    new_puts
-    mov     edx,    cadena2
-    call    new_puts
-    call    salto
-    mov     edx,    paso3
-    call    new_puts
-    mov     edx,    P3msj0
-    call    new_puts
     mov     edx,    cadena
-    call    new_puts
-    mov     edx,    cadena
+    call    contar_vocales
     call    salto
-    call    upperCase
-    mov     edx,    P3msj1
-    call    new_puts
-    mov     edx,    cadena
-    call    new_puts
-    call    salto
-                
     mov     eax,    1
     mov     ebx,    0
     int     80h 
-
 
 buscarLetra:
 ;   Entrada:    edx: direccion de cadena, edi: longitud cadena
@@ -187,7 +207,57 @@ upperLater:
 ret
 
 
-PASO_4:
+contar_vocales:
     ; Entrada: edx = Dir de la cadena a evaluar.
 
-    .ciclo_
+    push edx
+    push ecx
+    .ciclo_recorrer:
+        mov     al, [edx]
+        cmp     al, 0
+        je      .fin_cadena
+        call    vocal
+        inc     edx
+        jmp     .ciclo_recorrer
+    .fin_cadena:
+    cmp cl, 0
+    je  .fin_contar
+
+    jmp     .fin_contar
+    .no_Vocales:
+        mov     edx, p4msj0
+        call    puts
+    .fin_contar:
+    pop ecx
+    pop edx
+    ret
+
+vocal:
+;   Entrada:    al = caracter en codigo ASCCI.
+;   Salida:     cl = 0/1 para saber si es vocal.
+    mov     cl,     0
+    cmp     al,     'a'
+    je      .es_a
+    cmp     al,     'e'
+    je      .es_e
+    cmp     al,     'i'
+    je      .es_i
+    cmp     al,     'o'
+    je      .es_o
+    cmp     al,     'u'
+    je      .es_u
+    jmp     .fin_vocal
+    .es_a:
+        inc byte[vocal_A]
+    .es_e:
+        inc byte[vocal_E]
+    .es_i:
+        inc byte[vocal_I]
+    .es_o:
+        inc byte[vocal_O]
+    .es_u:
+        inc byte[vocal_U]
+    .es_vocal:
+        mov  cl, 1
+    .fin_vocal:
+ret
