@@ -17,15 +17,16 @@ section .data
     P3msj1: db  "Cadena en mayusculas: ",0
     paso4:  db  "Paso 4 - Contrar vocales",10, 0
     p4msj:  db  "Cadena a revisar: ",   0
-    p4msj0: db  "No se encontraron vocales"
-    p4msj1: db  "Se encontraron "
-    p4msj2: db  " vocales."
+    p4msj0: db  "No se encontraron vocales.",0
+    p4msj1: db  " Se encontraron ",0
+    p4msj2: db  " veces.",0
     Caracter_voacales: db "AEIOU",0
+
 
 
 section .bss
     cadena      resb    254
-    cadena2      resb    254
+    cadena2     resb    254
     temp        resb    8
     letra       resb    1
     ; Vocales
@@ -52,6 +53,12 @@ _start:
     mov     edx,        cadena
     mov     ecx,        254     ; Se indica la longitud de cadena.
     call    inputStr
+
+
+ 
+
+
+
     ; call    buscarLetra
     ; mov     edx,        paso2   ; Mostrar mensaje.
     ; call    new_puts
@@ -202,32 +209,64 @@ upperLater:
     
     sub al, 32
     ; otra solucion si dejara el rocha
-
     ; cmp al, 97
 ret
 
 
 contar_vocales:
     ; Entrada: edx = Dir de la cadena a evaluar.
+    ;   Tener una 5 variables de 1 byte para contar
+    push    edx
+    push    ecx
+    push    eax
+    push    edi
 
-    push edx
-    push ecx
+    mov     edi, 0
+    mov     ecx, 0
     .ciclo_recorrer:
-        mov     al, [edx]
+        mov     al, [edx + edi]
         cmp     al, 0
-        je      .fin_cadena
+        je      .fin_recorrer
         call    vocal
-        inc     edx
+        inc     edi
         jmp     .ciclo_recorrer
-    .fin_cadena:
-    cmp cl, 0
-    je  .fin_contar
+    .fin_recorrer:
+        cmp     ch, 0
+        je      .no_Vocales
+    .si_vocales:
+        mov     edi,    0
+        call    putchar
+        .ciclo_datos:
+            mov     edx,    Caracter_voacales
+            mov     al, [edx + edi]
+            cmp     al, 0
+            je      .fin_contar
+            call    putchar 
+            mov     edx, p4msj1
+            call    puts
 
-    jmp     .fin_contar
+
+            push    esi
+            push    eax
+            push    edx
+
+            mov     esi,    temp
+            mov     edx,    vocal_A 
+            mov     eax,    [edx]
+            call    printHex
+            inc     edi
+            call    salto
+
+            pop     edx
+            pop     eax
+            pop     esi
+            jmp     .ciclo_datos
     .no_Vocales:
         mov     edx, p4msj0
         call    puts
     .fin_contar:
+    pop edi
+    pop eax
     pop ecx
     pop edx
     ret
@@ -235,7 +274,9 @@ contar_vocales:
 vocal:
 ;   Entrada:    al = caracter en codigo ASCCI.
 ;   Salida:     cl = 0/1 para saber si es vocal.
+    push    edx
     mov     cl,     0
+
     cmp     al,     'a'
     je      .es_a
     cmp     al,     'e'
@@ -246,18 +287,51 @@ vocal:
     je      .es_o
     cmp     al,     'u'
     je      .es_u
+
     jmp     .fin_vocal
+
+
     .es_a:
-        inc byte[vocal_A]
+        mov     edx,    vocal_A
+        add     byte[edx],  1
+        jmp     .es_vocal
     .es_e:
-        inc byte[vocal_E]
+        inc     byte[vocal_E]
+        jmp     .es_vocal
     .es_i:
-        inc byte[vocal_I]
+        inc     byte[vocal_I]
+        jmp     .es_vocal
     .es_o:
-        inc byte[vocal_O]
+        inc     byte[vocal_O]
+        jmp     .es_vocal
     .es_u:
-        inc byte[vocal_U]
+        inc     byte[vocal_U]
+        jmp     .es_vocal
     .es_vocal:
-        mov  cl, 1
+        mov     ch, 1      ; Para mentener el valor de si es vocal.
     .fin_vocal:
+pop     edx
+ret
+
+
+
+limpiar_vocales:
+    push    edx
+
+    mov     edx,    vocal_A
+    mov     byte[edx],  0
+
+    mov     edx,    vocal_E
+    mov     byte[edx],  0
+
+    mov     edx,    vocal_I
+    mov     byte[edx],  0
+
+    mov     edx,    vocal_O
+    mov     byte[edx],  0
+
+    mov     edx,    vocal_U
+    mov     byte[edx],  0
+
+    pop     edx
 ret
