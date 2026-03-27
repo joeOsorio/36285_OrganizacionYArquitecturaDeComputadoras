@@ -3,7 +3,7 @@
 
 section .data
     msj:    db  "Practica 5", 10, 0
-    paso1:  db  "Parte 1 contar letras", 10, 0   
+    paso1:  db  "Parte 1 - contar letras", 10, 0   
     msj0:   db  "Ingrese cadena: ", 0
     msj1:   db  "Ingrese la letra a buscar: ", 0
     msj2:   db  "La letra se encotro en la posicion ", 0
@@ -30,12 +30,12 @@ section .bss
     temp        resb    8
     letra       resb    1
     ; Vocales
-    vocales     resb    1
-    vocal_A     resb    1
-    vocal_E     resb    1
-    vocal_I     resb    1
-    vocal_O     resb    1
-    vocal_U     resb    1
+    vocales     resb    4
+    vocal_A     resb    4
+    vocal_E     resb    4
+    vocal_I     resb    4
+    vocal_O     resb    4
+    vocal_U     resb    4
 
 
 section .text
@@ -53,42 +53,36 @@ _start:
     mov     edx,        cadena
     mov     ecx,        254     ; Se indica la longitud de cadena.
     call    inputStr
-
-
- 
-
-
-
-    ; call    buscarLetra
-    ; mov     edx,        paso2   ; Mostrar mensaje.
-    ; call    new_puts
-    ; mov     edx,        cadena
-    ; mov     edi,        cadena2
-    ; call    invertir
-    ; mov     edx,    msj4
-    ; call    new_puts
-    ; mov     edx,    cadena
-    ; call    new_puts
-    ; call    salto
-    ; mov     edx,    msj5
-    ; call    new_puts
-    ; mov     edx,    cadena2
-    ; call    new_puts
-    ; call    salto
-    ; mov     edx,    paso3
-    ; call    new_puts
-    ; mov     edx,    P3msj0
-    ; call    new_puts
-    ; mov     edx,    cadena
-    ; call    new_puts
-    ; mov     edx,    cadena
-    ; call    salto
-    ; call    upperCase
-    ; mov     edx,    P3msj1
-    ; call    new_puts
-    ; mov     edx,    cadena
-    ; call    new_puts
-    ; call    salto
+    call    buscarLetra
+    mov     edx,        paso2   ; Mostrar mensaje.
+    call    new_puts
+    mov     edx,        cadena
+    mov     edi,        cadena2
+    call    invertir
+    mov     edx,    msj4
+    call    new_puts
+    mov     edx,    cadena
+    call    new_puts
+    call    salto
+    mov     edx,    msj5
+    call    new_puts
+    mov     edx,    cadena2
+    call    new_puts
+    call    salto
+    mov     edx,    paso3
+    call    new_puts
+    mov     edx,    P3msj0
+    call    new_puts
+    mov     edx,    cadena
+    call    new_puts
+    mov     edx,    cadena
+    call    salto
+    call    upperCase
+    mov     edx,    P3msj1
+    call    new_puts
+    mov     edx,    cadena
+    call    new_puts
+    call    salto
     mov     edx,    paso4
     call    new_puts
     mov     edx,    p4msj
@@ -193,8 +187,11 @@ upperCase:
         mov     al, [edx]
         cmp     al, 0
         je      .fin_upperCase
+        cmp     al, 32 ; comparar con espacio
+        je      .espacio
         ; call    upperLater
         sub     al, 32
+        .espacio:
         mov     byte[edx],  al ; guardar letra casteada
         inc     edx     ; moverme a la siguiente posicion
         jmp     .ciclo_upperCase  
@@ -206,12 +203,14 @@ ret
 upperLater:
     ; Entrada:  al = Caracter convertir mayuscula.
     ; Salida    al = Letra mayuscula
-    
+    ; Saber si 97 < AL > 123
+    ; Solo en ese caso si se  resta.
+    ; Pero aun no hemos mirado otros saltos. 
+    ; codigo ascci 97 = a ,  z = 122
     sub al, 32
     ; otra solucion si dejara el rocha
     ; cmp al, 97
 ret
-
 
 contar_vocales:
     ; Entrada: edx = Dir de la cadena a evaluar.
@@ -244,22 +243,9 @@ contar_vocales:
             call    putchar 
             mov     edx, p4msj1
             call    puts
-
-
-            push    esi
-            push    eax
-            push    edx
-
-            mov     esi,    temp
-            mov     edx,    vocal_A 
-            mov     eax,    [edx]
-            call    printHex
+            call    mostrar_cantidad_letra
             inc     edi
             call    salto
-
-            pop     edx
-            pop     eax
-            pop     esi
             jmp     .ciclo_datos
     .no_Vocales:
         mov     edx, p4msj0
@@ -288,8 +274,18 @@ vocal:
     cmp     al,     'u'
     je      .es_u
 
+    cmp     al,     'A'
+    je      .es_a
+    cmp     al,     'E'
+    je      .es_e
+    cmp     al,     'I'
+    je      .es_i
+    cmp     al,     'O'
+    je      .es_o
+    cmp     al,     'U'
+    je      .es_u
+    
     jmp     .fin_vocal
-
 
     .es_a:
         mov     edx,    vocal_A
@@ -315,23 +311,57 @@ ret
 
 
 
-limpiar_vocales:
+mostrar_cantidad_letra:
+    push    esi
+    push    eax
     push    edx
 
-    mov     edx,    vocal_A
-    mov     byte[edx],  0
+    mov     esi,    temp ; Se realiza para poder utilizar printHex
 
-    mov     edx,    vocal_E
-    mov     byte[edx],  0
+    cmp     edi, 0
+    je      .count_a
 
-    mov     edx,    vocal_I
-    mov     byte[edx],  0
+    cmp     edi, 1
+    je      .count_e
 
-    mov     edx,    vocal_O
-    mov     byte[edx],  0
+    cmp     edi, 2
+    je      .count_i
 
-    mov     edx,    vocal_U
-    mov     byte[edx],  0
+    cmp     edi, 3
+    je      .count_o
 
+    cmp     edi, 4
+    je      .count_u
+
+
+    .count_a:
+        mov     edx,    vocal_A
+        mov     eax,    [edx]
+        call    printHex
+        jmp     .fin_count
+    .count_e:
+        mov     edx,    vocal_E
+        mov     eax,    [edx]
+        call    printHex
+        jmp     .fin_count
+    .count_i:
+        mov     edx,    vocal_I
+        mov     eax,    [edx]
+        call    printHex
+        jmp     .fin_count
+    .count_o:
+        mov     edx,    vocal_O
+        mov     eax,    [edx]
+        call    printHex
+        jmp     .fin_count
+    .count_u:
+        mov     edx,    vocal_U
+        mov     eax,    [edx]
+        call    printHex
+        jmp     .fin_count
+
+    .fin_count:
     pop     edx
+    pop     eax
+    pop     esi
 ret
