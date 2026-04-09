@@ -93,7 +93,7 @@ palindromo:
 		mov ah,		[ebx + edi]
 		mov al, 	[ebx + esi]
 		cmp ah,		al
-		jne fin_ciclo
+		jne fin_ciclo ; algo le movi y creo que se rompio.
 		dec edi
 		inc esi
 		cmp edi, 	esi
@@ -123,6 +123,24 @@ outputStr:
 	.fin_mostrar:
 ret
 
+buscarSpacios:
+	push edx
+	push edi
+	push eax
+
+	mov		edi, 0
+	ciclo_buscarSpacios:
+
+	mov	al, [edx, edi]
+	cmp	al,	' '
+	je	
+
+	pop		eax
+	push	edi
+	pop 	edx
+
+ret
+
 inputStr:
 	; Entrada:	EDX	-> 	Direccion de la variable.
 	;			ECX	-> 	logitud de cadena		
@@ -133,7 +151,8 @@ inputStr:
 		cmp		edi,	ecx
 		je		.fin_captura2
 		call	getche
-		cmp 	al, 	'+'			; Compara con el caracter + para terminar la captura.
+		cmp 	al, 	10
+		; cmp 	al, 	'+'			; Compara con el caracter + para terminar la captura.
 		je 		.fin_captura
 		mov 	[edx + edi], 	al
 		inc 	edi
