@@ -129,12 +129,15 @@ buscarSpacios:
 	push eax
 
 	mov		edi, 0
-	ciclo_buscarSpacios:
+	.ciclo_buscarSpacios:
 
 	mov	al, [edx, edi]
 	cmp	al,	' '
-	je	
-
+	je	.fin_espacio
+	inc edi
+	jmp .ciclo_buscarSpacios
+	
+	.fin_espacio:
 	pop		eax
 	push	edi
 	pop 	edx
@@ -197,6 +200,51 @@ printHex:
   int 80h
   popad
   ret
+
+; ------------------------------
+; Laboratorio 6
+; ------------------------------
+
+; contarPalabras:
+; ; Entrada: edx	-> dir de la cadena.
+; ; utiliza:
+; ; salida:
+
+; mov edi, 0
+
+; .ciclo_palabra:
+; 	call word_len
+
+; 	mov 
+
+
+
+
+
+
+
+; ret
+
+; word_len:
+; 	; Entrada:	EBX -> Direccion de la cadena a evaluar. 
+; 	;			EDI -> Longitud de cadena sin contemplar 0
+; 	; Utiliza:	Al
+; 	; Salida:   Ninguna
+; 	push	edi
+; 	push 	eax
+; 	mov		edi, 	0
+; 	.ciclo_word_len:
+; 		mov al, 	[ebx + edi]
+; 		cmp al, 	" "
+; 		je 	.fin_ciclo_word_len
+; 		inc	edi
+; 		jmp .ciclo_word_len
+; 	.fin_ciclo_word_len:
+; 	; mov al, edi 
+; 	;pop edi
+; 	pop eax
+; ret
+
 
 new_puts:
 	; Entrada:	edx 		->	Dir de la cadena.
