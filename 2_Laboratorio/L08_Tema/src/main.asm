@@ -1,120 +1,99 @@
 %include "./pc_io.inc"
 
 %include "my_routines.asm"
-
 section .data
-    paso0:      db "Laboratorio",10,0
-    msjP1_0:    db "Capturar Cadena binaria",10,0
+    titulo:      db "Laboratorio",10,0
+    msjP1_0:    db "Capturar Cadena binaria de 16 bits",10,0
     msjP1_0_1:  db "Ejemplo: 0110111100011000",10,0
     msjP1_1:    db "Ingrese cadena binaria: ", 0
-    msjP1_2:    db "La cadena es: ", 0
-    StrBin:  db "0110111100011000",0
-    len: equ $-StrBin
+    msjP1_2:    db "La cadena en hex es: ", 0
+    StrBin:     dw    1111111111110001b  ; 16 bits
+    ; StrBin:     dw 0110111100011000b  ; 16 bits
+    ;  6    f    1    8
+    ; 0110 1111 0001 1000 b
 
 section .bss
-    cadena          resb    254
-    direciones      resb    50  ; Direcciones de cada palabra
-    longitud        resb    50  ; Numero de letras para cada palabra.
-    simbolos        resb    100 ; Todavia no nos dice.
-    palabras        resb    4   ; indica cuantas palabas tiene.
-    temp            resb    8
-    cad             resb    4
+    cadena      resb 256    ; para entrada del usuario
+    cad         resb 5
 
 section .text
     global _start
 
-
 _start:
     call    clrscr
     call    salto
-    mov     edx, paso0
+    mov     edx,            titulo
     call    new_puts
-    mov     edx,    msjP1_0
+    mov     edx,            msjP1_0
     call    new_puts
-    ; mov     edx,    msjP1_1
+    mov     edx,            msjP1_0_1
+    call    new_puts
+
+    ; Opcional: entrada del usuario
+    ; mov     edx, msjP1_1
     ; call    new_puts
-    ; mov     ecx, 254
     ; mov     edx, cadena
-    ; mov     ecx, 254
+    ; mov     ecx, 255
     ; call    inputStr
-    mov     edx, msjP1_2
-    call    new_puts
-    mov     edx, StrBin
-    call    new_puts
-    call    salto
 
-    ; Despues de aqui.
-    ; hex          6    F   1     8   h
-    ; StrBin -> "0110 1111 0001 1000" b
+    mov     ebx,            StrBin
+    mov     edx,            [ebx]
+    mov     esi,            cad
 
-    mov     edx, StrBin
-    mov     esi, cad        ; Mover una cadena de 8 bytes
     call    cadBinToHex
-
-    mov     edx, esi
+    mov     byte[esi + 5],  "0"
+    mov     edx,            esi
     call    new_puts
 
-
-;retunr 0
-mov eax, 1
-mov ebx, 0
-int 80h
+    ; Salir
+    mov     eax, 1
+    mov     ebx, 0
+    int     80h
 
 cadBinToHex:
-    ; Entrada: edx -> dir de la cadena binaria a convertir.
-    ; Salida:  esi -> cad de min 4 bytes para el resultado
-    pusha
-    mov ecx, 4          ; Para 4 dígitos hex
-    mov ebx, 0          ; Acumulador para el valor actual
-    
-.procesar_grupo:
-    mov edi, 4          ; 4 bits por grupo
-    xor bl, bl          ; Limpiar acumulador
-    
-.procesar_bit:
-    dec edi
-    mov al, [edx]       ; Leer siguiente carácter
-    cmp al, '1'
-    jne .no_sumar
-    
-    ; Sumar según posición (1,2,4,8)
-    cmp edi, 0
-    je .sumar_1
-    cmp edi, 1
-    je .sumar_2
-    cmp edi, 2
-    je .sumar_4
-    ; edi = 3
-    add bl, 8
-    jmp .no_sumar
-    
-.sumar_4:
-    add bl, 4
-    jmp .no_sumar
-.sumar_2:
-    add bl, 2
-    jmp .no_sumar
-.sumar_1:
-    add bl, 1
-    
-.no_sumar:
-    inc edx             ; Siguiente bit
-    cmp edi, 0
-    jg .procesar_bit    ; Procesar 4 bits
-    
-    ; Convertir nibble a carácter hex
-    cmp bl, 9
-    jg .letra_hex
-    add bl, '0'
-    jmp .guardar_car
-    
-.letra_hex:
-    sub bl, 10
-    add bl, 'A'
-    
-.guardar_car:
-    mov [esi + ecx - 1], bl
-    loop .procesar_grupo
-    mov byte [esi + 4], 0  ; Terminar cadena
-    popa
+    ; Entrada: EDX = puntero a cadena binaria (solo '0' y '1')
+    ; Salida:  ESI = cadena convertida a Hexadecimal.
+    pushad
+    mov     ecx,    4  ; Para recorrer de 1 byte en 1.
+    mov     eax,    0
+    .recorrido:
+        rol     dx,     4 ; Mover 4 bites.
+        push    dx
+        and     dl,     0fh
+        cmp     dl,     9
+        jbe     .convertirASCII
+        add     dl,     7
+        .convertirASCII:
+            add     dl,                 "0"
+            mov     byte[esi+eax] ,     dl
+            inc     eax ; Recorro el apuntador a la sifuiente posicion
+            pop     dx
+        loop .recorrido
+    popad
     ret
+
+cadStrToBin:
+    ; Entrada: EDX = puntero a cadena de caracteres  (solo '0' y '1') y finaliza con 0
+    pushad
+    xor     ecx,ecx
+    
+    .recorrer_cadena:
+        cmp     byte[edx + cl], 0
+        jmp     .fin_recorrido_cadStrToBin
+        
+        cmp     byte[edx + cl], "0"
+        jmp     .esCero_cadStrToBin
+
+        cmp     byte[edx + cl], "1"
+        jmp     .esUno_cadStrToBin
+
+        jmp     .error_cadStrToBin
+
+        .esCero_cadStrToBin:
+
+    
+        .esUno_cadStrToBin:
+
+        .error_cadStrToBin:
+    loop .recorrer_cadena
+ret
