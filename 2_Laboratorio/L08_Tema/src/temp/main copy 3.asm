@@ -8,7 +8,7 @@ section .data
     msjP1_0_1:  db "Ejemplo: 0110111100011000",10,0
     msjP1_1:    db "Ingrese cadena binaria: ", 0
     msjP1_2:    db "La cadena es: ", 0
-    StrBin:  db "0110111100011000",0
+    StrBin:  db "0110111100011000",0            ; Adminte un registro de 32
     len: equ $-StrBin
 
 section .bss
