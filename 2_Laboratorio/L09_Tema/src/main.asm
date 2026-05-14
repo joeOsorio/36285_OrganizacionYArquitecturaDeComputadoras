@@ -11,9 +11,13 @@ section .bss
     temp    resb    3
     array   resb    99
 
+section .text
+    global _start
+
 _start:
-    call   capDec
+    call   capturarDecimal
     mov    esi, cad
+    call    salto
     call    printHex
 
 
@@ -28,10 +32,13 @@ int 80h
 capturarDecimal:
     ; Entradas: AX
     ; Salidas: AX    
-    push    edx
+    push    ebx
     push    ecx
+    push    edx
     mov     ecx, 3
+    xor     eax, eax
     xor     dx, dx  ;Limpiar registro.
+    xor     ebx, ebx
     .capDec:
         call    getche
         cmp     al, "0"
@@ -51,14 +58,17 @@ capturarDecimal:
         .mul_100:
             mov     dx, 100
             mul     dx
-            jmp.    .sumar
+            jmp    .sumar
         .mul_10:
             mov     dx, 10
-            mol     dx
+            mul     dx
         .sumar:
             add     ax, dx
+            mov     bx, ax
         .finCapDec:
     loop    .capDec
-    pop     ecx
+    mov     eax,    ebx
     pop     edx
+    pop     ecx
+    pop     ebx
     ret

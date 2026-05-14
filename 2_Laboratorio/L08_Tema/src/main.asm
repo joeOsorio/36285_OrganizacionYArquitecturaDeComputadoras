@@ -16,7 +16,6 @@ section .data
     ;  6    f    1    8
     ; 0110 1111 0001 1000 b
 
-section .bss
     cadena      resb 256    ; para entrada del usuario
     cad         resb 5      ; Se reservan 5 por el 0 al final.
 
