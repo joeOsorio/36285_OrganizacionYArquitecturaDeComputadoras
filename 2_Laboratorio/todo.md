@@ -325,3 +325,9 @@ jmp Realiza simpre el salto.
 Registros de direccionamiento 
 ESI Origen
 EDI Destino
+
+
+
+Para ejecurar en windows acudir a https://www.nasm.us/ 
+
+y agreagar a variables de entorno C:\Users\user\AppData\Local\bin\NASM

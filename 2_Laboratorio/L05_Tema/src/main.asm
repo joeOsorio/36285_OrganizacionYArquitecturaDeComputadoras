@@ -255,14 +255,14 @@ contar_vocales:
     pop eax
     pop ecx
     pop edx
-    ret
+ret
 
 vocal:
 ;   Entrada:    al = caracter en codigo ASCCI.
 ;   Salida:     cl = 0/1 para saber si es vocal.
     push    edx
     mov     cl,     0
-
+    ; Compar vocales minisculas.
     cmp     al,     'a'
     je      .es_a
     cmp     al,     'e'
@@ -273,7 +273,7 @@ vocal:
     je      .es_o
     cmp     al,     'u'
     je      .es_u
-
+    ; Comparar vocales mayúsculas.
     cmp     al,     'A'
     je      .es_a
     cmp     al,     'E'
@@ -284,7 +284,7 @@ vocal:
     je      .es_o
     cmp     al,     'U'
     je      .es_u
-    
+    ; Si no hacer nada.
     jmp     .fin_vocal
 
     .es_a:
@@ -318,7 +318,9 @@ mostrar_cantidad_letra:
 
     mov     esi,    temp ; Se realiza para poder utilizar printHex
 
-    cmp     edi, 0
+    ; Como manejo edi como indice de AEIOU
+    ;                       edi      01234
+    cmp     edi, 0 
     je      .count_a
 
     cmp     edi, 1
