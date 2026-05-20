@@ -265,3 +265,19 @@ ret
 section .data
     _newline db 0x0A
     _space   db 0x20
+
+
+; pow:
+; 	; Entradas: EAX -> Base
+; 	; 			ECX -> Exponente
+; 	; Salida: 	EAX
+; 	push	ecx
+; 	push 	ebx
+; 	mov		ebx, eax 
+; 	dec		ecx
+; 	.ciclo_pow:
+; 		imul eax, ebx
+; 		loop ciclo_pow
+; 	pop		ebx
+; 	pop 	ecx
+; 	ret

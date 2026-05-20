@@ -4,21 +4,31 @@
 section .data
     msj0: db    "Practica 9 - Arreglos",10,0
     msj1: db    "Ingrese el taño del arreglo:",10,0
-    msj2: db    "",10,0
+    msj2: db    "ngresarvalordecimalde3dígitos",10,0
 
 section .bss
     cad     resb    4
     temp    resb    3
     array   resb    99
+    cad     resb    5
 
 section .text
     global _start
 
 _start:
-    call   capturarDecimal
-    mov    esi, cad
-    call    salto
-    call    printHex
+    xor eax, eax
+    mov ecx, 3
+    mov eax, 4
+
+    call    pow
+    mov esi, cad
+    call printHex
+
+
+    ; call   capturarDecimal
+    ; mov    esi, cad
+    ; call    salto
+    ; call    printHex
 
 
 
@@ -30,8 +40,8 @@ int 80h
 
 
 capturarDecimal:
-    ; Entradas: AX
-    ; Salidas: AX    
+    ; Entradas: ECX -> longitud del numero
+    ; Salidas:  AX    
     push    ebx
     push    ecx
     push    edx
@@ -46,22 +56,20 @@ capturarDecimal:
         cmp     al, "9"
         ja      .noNumero
         sub     al, "0"     ; Se combierte en numero.        
-        cmp     ecx, 3
-        je      .mul_100
-        cmp     ecx, 2
-        je      .mul_10
-        ; add     dx, al
+        cmp     ecx, 1
+        ja      .mul_base
         jmp     .sumar
         .noNumero:
             inc     ecx   
             jmp     .finCapDec
-        .mul_100:
-            mov     dx, 100
-            mul     dx
-            jmp    .sumar
-        .mul_10:
-            mov     dx, 10
-            mul     dx
+        .mul_base:
+            push    eax
+            mov     eax, 10
+            call    pow
+            mov     ebx, eax ; ebx esta el resutado final.
+            pop     eax
+
+
         .sumar:
             add     ax, dx
             mov     bx, ax
@@ -72,3 +80,19 @@ capturarDecimal:
     pop     ecx
     pop     ebx
     ret
+
+
+    pow:
+	; Entradas: EAX -> Base
+	; 			ECX -> Exponente
+	; Salida: 	EAX
+	push	cx
+	push 	bx
+	mov		bx, ax 
+	dec		cx
+	.ciclo_pow:
+		imul ax, bx
+		loop ciclo_pow
+	pop		bx
+	pop 	cx
+	ret
