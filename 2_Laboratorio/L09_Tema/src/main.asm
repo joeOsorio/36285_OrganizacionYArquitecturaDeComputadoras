@@ -15,19 +15,13 @@ section .text
     global _start
 
 _start:
-    xor     eax,    eax
-    mov     cx,     2
-    mov     ax,     10
-    call    pow
-    mov     esi,    cad
+    mov     cx, 3
+    xor     ax, ax
+    call    capturarDecimal
+    mov     esi, cad
+    call    salto
     call    printHex
-
-
-    ; call   capturarDecimal
-    ; mov    esi, cad
-    ; call    salto
-    ; call    printHex
-
+    
 
 
 
@@ -40,13 +34,12 @@ int 80h
 capturarDecimal:
     ; Entradas: ECX -> longitud del numero
     ; Salidas:  AX    
-    push    ebx
-    push    ecx
-    push    edx
-    mov     ecx, 3
-    xor     eax, eax
+    push    bx
+    push    cx
+    push    dx
+    xor     ax, ax
     xor     dx, dx  ;Limpiar registro.
-    xor     ebx, ebx
+    xor     bx, bx  ; Suma acumulativa para 
     .capDec:
         call    getche
         cmp     al, "0"
@@ -55,28 +48,26 @@ capturarDecimal:
         ja      .noNumero
         sub     al, "0"     ; Se combierte en numero.        
         cmp     ecx, 1
-        ja      .mul_base
+        jga      .mul_base
         jmp     .sumar
         .noNumero:
             inc     ecx   
             jmp     .finCapDec
         .mul_base:
-            push    eax
-            mov     eax, 10
+            push    ax
+            mov     ax, 10
             call    pow
-            mov     ebx, eax ; ebx esta el resutado final.
-            pop     eax
-
-
+            add     bx, ax ; ebx esta el resutado final.
+            pop     ax  
         .sumar:
-            add     ax, dx
+            add     dx, ax
             mov     bx, ax
         .finCapDec:
     loop    .capDec
-    mov     eax,    ebx
-    pop     edx
-    pop     ecx
-    pop     ebx
+    mov     ax,    bx
+    pop     dx
+    pop     cx
+    pop     bx
     ret
 
 
