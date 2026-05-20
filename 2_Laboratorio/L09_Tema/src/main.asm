@@ -10,19 +10,17 @@ section .bss
     cad     resb    4
     temp    resb    3
     array   resb    99
-    cad     resb    5
 
 section .text
     global _start
 
 _start:
-    xor eax, eax
-    mov ecx, 3
-    mov eax, 4
-
+    xor     eax,    eax
+    mov     cx,     2
+    mov     ax,     10
     call    pow
-    mov esi, cad
-    call printHex
+    mov     esi,    cad
+    call    printHex
 
 
     ; call   capturarDecimal
@@ -83,16 +81,16 @@ capturarDecimal:
 
 
     pow:
-	; Entradas: EAX -> Base
-	; 			ECX -> Exponente
-	; Salida: 	EAX
-	push	cx
-	push 	bx
+	; Entradas: AX -> Base
+	; 			CX -> Exponente
+	; Salida: 	AX
+	; push	cx
+	; push 	bx
 	mov		bx, ax 
 	dec		cx
 	.ciclo_pow:
 		imul ax, bx
-		loop ciclo_pow
-	pop		bx
-	pop 	cx
+		loop .ciclo_pow
+	; pop		bx
+	; pop 	cx
 	ret
