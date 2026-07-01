@@ -15,8 +15,8 @@ section .text
     global _start
 
 _start:
-    mov     cx, 3
-    xor     ax, ax
+    mov     ecx, 3
+    xor     eax, eax
     call    capturarDecimal
     mov     esi, cad
     call    salto
@@ -34,11 +34,11 @@ int 80h
 capturarDecimal:
     ; Entradas: ECX -> longitud del numero
     ; Salidas:  AX    
-    push    bx
-    push    cx
-    push    dx
+    ; push    bx
+    ; push    cx
+    ; push    dx
+    pushad
     xor     ax, ax
-    xor     dx, dx  ;Limpiar registro.
     xor     bx, bx  ; Suma acumulativa para 
     .capDec:
         call    getche
@@ -47,21 +47,21 @@ capturarDecimal:
         cmp     al, "9"
         ja      .noNumero
         sub     al, "0"     ; Se combierte en numero.        
-        cmp     ecx, 1
-        jga      .mul_base
-        jmp     .sumar
+        cmp     ecx, 1      ; Contador de posición  es igual o mayor a 1.
+        jae      .mul_base  ; Multiplca por base 10
+        jmp     .sumar      ; Solo sumar el numero comvertido.
         .noNumero:
             inc     ecx   
             jmp     .finCapDec
         .mul_base:
-            push    ax
+            mov     dx, ax
             mov     ax, 10
             call    pow
+            mul     dx
             add     bx, ax ; ebx esta el resutado final.
-            pop     ax  
+            jmp     .finCapDec 
         .sumar:
-            add     dx, ax
-            mov     bx, ax
+            add     bx, ax
         .finCapDec:
     loop    .capDec
     mov     ax,    bx
@@ -70,18 +70,23 @@ capturarDecimal:
     pop     bx
     ret
 
-
-    pow:
+pow:
 	; Entradas: AX -> Base
 	; 			CX -> Exponente
 	; Salida: 	AX
-	; push	cx
-	; push 	bx
+    push    bx
+    push    dx
+	mov     dx, cx    
+    push	cx
+    mov     cx, dx
+
 	mov		bx, ax 
 	dec		cx
 	.ciclo_pow:
 		imul ax, bx
 		loop .ciclo_pow
-	; pop		bx
-	; pop 	cx
+	
+    pop 	cx
+    pop     dx
+    pop		bx
 	ret
