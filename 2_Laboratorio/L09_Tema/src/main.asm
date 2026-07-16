@@ -21,7 +21,7 @@ _start:
     mov     esi, cad
     call    salto
     call    printHex
-    
+
 
 
 
@@ -29,7 +29,6 @@ _start:
 mov eax, 1
 mov ebx, 0
 int 80h
-
 
 capturarDecimal:
     ; Entradas: ECX -> longitud del numero
