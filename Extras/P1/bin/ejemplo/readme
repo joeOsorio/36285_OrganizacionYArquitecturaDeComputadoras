@@ -1,0 +1,127 @@
+# Compilación y enlazado de C + ensamblador (NASM) en Windows 11
+
+Este proyecto combina un programa en **C** (`ejemploC.c`) con una función escrita en **ensamblador x86** (`libASM.asm`), compilada con **NASM** y enlazada con **GCC (MinGW)** de 32 bits.
+
+## Entorno usado
+
+- `gcc.exe (MinGW.org GCC-6.3.0-1) 6.3.0` — MinGW "clásico" (no MinGW-w64)
+- `NASM version 3.01`
+- Windows 11 + PowerShell
+
+## El problema original
+
+Al intentar enlazar los dos objetos aparecía este error:
+
+```
+ejemploC.o:ejemploC.c:(.text+0x4e): undefined reference to `sumaLista'
+collect2.exe: error: ld returned 1 exit status
+```
+
+Esto pasó por **tres motivos combinados**:
+
+### 1. Formato de objeto incorrecto (`-f elf`)
+
+Se estaba ensamblando con:
+
+```powershell
+nasm -f elf libASM.asm -o libASM.o
+```
+
+`-f elf` genera un objeto para Linux. En Windows, con MinGW, el formato correcto para 32 bits es **`win32`** (formato PE/COFF).
+
+### 2. Sintaxis inválida en `global`
+
+El archivo `.asm` tenía:
+
+```asm
+global sumaLista:
+```
+
+El `:` sobra ahí — `global` solo lleva el nombre del símbolo, sin dos puntos.
+
+### 3. Underscore prefix del compilador (el motivo principal)
+
+El GCC de mingw.org, en modo 32 bits, antepone un guion bajo (`_`) a los nombres de las funciones C al compilarlas. Esto se puede confirmar así:
+
+```powershell
+nm ejemploC.o | Select-String "suma"
+```
+
+Resultado:
+
+```
+         U _sumaLista
+```
+
+La `U` indica que el símbolo está **undefined** (sin resolver) — es justo lo que la función en ensamblador debe llenar, pero con el nombre `_sumaLista`, **no** `sumaLista`.
+
+> `Select-String` es el equivalente nativo de `grep` en PowerShell. También funciona `findstr "suma"` si vienes de la costumbre de CMD/bash.
+
+## Solución: `libASM.asm` corregido
+
+```asm
+section .data
+section .bss
+section .text
+global _sumaLista
+_sumaLista:
+  push  EBP
+  mov   ebp, esp
+  push  EBX
+  push  EDI
+  push  ESI
+  mov   esi, [ebp+8]
+  mov   ecx, [ebp+12]
+  mov   eax, 0
+  mov   edi, 0
+  .continue:
+    add eax, [esi+edi*4]
+    inc edi
+  loop .continue
+  pop ESI
+  pop EDI
+  pop EBX
+  mov esp, ebp
+  pop EBP
+ret
+```
+
+Cambios respecto al original:
+- Se quitó el `:` sobrante después de `global sumaLista`.
+- Se agregó el prefijo `_` tanto en `global _sumaLista` como en la etiqueta `_sumaLista:`.
+
+## Pasos de compilación (PowerShell)
+
+```powershell
+# 1. Compilar el código C a objeto (32 bits)
+gcc -m32 -c ejemploC.c -o ejemploC.o
+
+# 2. Ensamblar el código ASM en formato win32 (NO elf)
+nasm -f win32 libASM.asm -o libASM.o
+
+# 3. Enlazar ambos objetos en el ejecutable final
+gcc -m32 libASM.o ejemploC.o -o ejemplo
+
+# 4. Ejecutar
+.\ejemplo.exe
+```
+
+Salida esperada:
+
+```
+Suma: 15
+```
+
+## Checklist rápido si vuelve a fallar
+
+- [ ] ¿El formato de NASM coincide con tu toolchain? (`win32` para MinGW 32 bits, no `elf`)
+- [ ] ¿El nombre del símbolo en el `.asm` coincide **exactamente** con el que exige el compilador de C? Verifícalo con `nm archivo.o | Select-String "nombre"`
+- [ ] ¿La sintaxis de `global` no tiene caracteres de más (`:`, espacios raros, etc.)?
+- [ ] ¿Estás usando `-m32` de forma consistente en los tres comandos (compilar, ensamblar, enlazar)?
+
+## Nota sobre el underscore prefix
+
+Este prefijo `_` es una convención de nombres (*name mangling*) específica de **compiladores C antiguos en Windows de 32 bits** (cdecl calling convention del viejo mingw.org). No es universal:
+- En Linux (ELF, System V ABI) normalmente **no** se usa el underscore.
+- En MinGW-w64 moderno de 64 bits tampoco se usa.
+- Por eso siempre conviene verificar con `nm` en lugar de asumir el nombre del símbolo.
