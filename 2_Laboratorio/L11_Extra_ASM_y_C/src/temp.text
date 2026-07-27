@@ -1,18 +1,24 @@
 /* ============================================================
  * P11_enC.c
- * Practica 11 - OAC
+ * Practica 11 - OAC (Linux)
  * Captura una cadena numerica, la muestra, la convierte a
  * decimal y la imprime en hexadecimal y decimal usando
- * subrutinas escritas en ensamblador (P11_enASM.asm)
+ * subrutinas escritas en ensamblador (P11_enASM.asm), las
+ * cuales reutilizan puts/getche de la libreria compartida LIB.
+ *
+ * Nota: NO se incluye <stdlib.h> a proposito, para que el
+ * "atoi" propio (con otra firma) no choque con el de la
+ * libreria estandar de C.
  * ============================================================ */
 
 #include <stdio.h>
 
-/* Subrutinas implementadas en P11_enASM.asm */
+/* Subrutinas implementadas en P11_enASM.asm (cdecl) */
 extern void gets(int *direccion_donde_se_guarda_la_cadena_capturada);
 extern unsigned int atoi(int *cadena_con_numero);
 extern void printHex(unsigned int valor_a_imprimir);
 extern void printDec(unsigned int valor_a_imprimir);
+extern void mostrarCadena(char *cadena); /* reutiliza "puts" de la LIB */
 
 #define TAM_BUFFER 100
 
@@ -21,23 +27,34 @@ int main(void)
     char cadena[TAM_BUFFER];
     unsigned int valor;
 
+    fflush(stdout);
     printf("=== Practica 11 - OAC ===\n");
     printf("Ingresa una cadena de caracteres numericos terminada en '*'\n");
     printf("Ejemplo: 12345*\n");
     printf("Cadena: ");
+    fflush(stdout);
 
     gets((int *)cadena);
+    fflush(stdout);
+    printf("\n");
 
-    printf("\nSalida de puts:      ");
-    puts(cadena);
+    printf("Salida de puts:      ");
+    fflush(stdout);
+    mostrarCadena(cadena);
+    printf("\n");
+    fflush(stdout);
 
     valor = atoi((int *)cadena);
-
+    fflush(stdout);
     printf("Salida de printHex:  ");
+    fflush(stdout);
     printHex(valor);
+    printf("\n");
 
     printf("Salida de printDec:  ");
+    fflush(stdout);
     printDec(valor);
+    printf("\n");
 
     return 0;
 }

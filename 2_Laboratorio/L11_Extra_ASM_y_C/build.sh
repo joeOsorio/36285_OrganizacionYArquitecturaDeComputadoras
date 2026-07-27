@@ -1,0 +1,16 @@
+#!/bin/bash
+#  para ejecutar el ejemplo de la practica.
+
+set -e  # Detiene el script si hay error
+
+echo "Ensamblando..."
+nasm -f elf32 -I../LIB src/ejemplo/libASM.asm -o output/ejemplo/libASM.o
+
+echo "Compilar archivo C..."
+gcc -m32 -c src/ejemplo/ejemploC.c -o output/ejemplo/P11_enC.o
+
+echo "Enlazando..."
+gcc -m32 -o bin/ejemplo output/ejemplo/libASM.o output/ejemplo/P11_enC.o ../LIB/libpc_io.a
+
+echo "Ejecutando ejemplo..."
+./bin/ejemplo

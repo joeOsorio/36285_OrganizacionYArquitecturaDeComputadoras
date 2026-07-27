@@ -1,0 +1,5 @@
+Problema: Al capturar la cadena con gets (ASM), el carácter terminador * aparecía duplicado en pantalla (ej. 159** en vez de 159*), aunque el buffer se guardaba correctamente (confirmado con mostrarCadena).
+
+Causa: La subrutina getche de libpc_io.a no imprime el eco por software — lo produce el driver de la terminal de Linux, ya que getche solo apaga/prende el bit ICANON de termios en cada llamada, dejando el bit ECHO siempre activo. Al alternar ICANON carácter por carácter (en vez de una sola vez para toda la cadena), se genera una condición de carrera entre el tecleo del usuario y el cambio de modo de la terminal, provocando que el driver reprocese/eco duplique el último carácter leído.
+
+Solución: Sustituir getche por getch (que apaga tanto ICANON como ECHO) dentro del ciclo de gets, y hacer el eco manualmente con call putchar justo después de verificar que el carácter no es el terminador *. Así el eco queda bajo control total del programa y deja de depender del comportamiento del driver de la tty.

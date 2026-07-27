@@ -1,8 +1,16 @@
+section .note.GNU-stack noalloc noexec nowrite progbits
+
+
 section .data
 section .bss
 section .text
-global _sumaLista
-_sumaLista:
+; Para copilar en Win 11 utiliza el gion bajo.
+; Para linux utiliza sin guion bajo.
+
+global sumaLista
+;global _sumaLista
+sumaLista:
+;_sumaLista:
   push  EBP
   mov   ebp, esp
   push  EBX
