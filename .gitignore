@@ -58,6 +58,8 @@
 # # !.vscode/settings.json
 # # !.vscode/tasks.json
 # # !.vscode/launch.json
+# # !DOC-20260617-WA0006.pdf
+
 
 # # --- Kernel Module Compile Results ---
 # *.mod*
@@ -73,7 +75,6 @@
 # *.docx
 
 # Archivos temporales de Office
-~$*
 
 # Archivos temporales de Windows
 Thumbs.db
